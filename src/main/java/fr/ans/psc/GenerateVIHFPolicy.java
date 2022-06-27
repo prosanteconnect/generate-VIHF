@@ -1,21 +1,10 @@
-/**
- * Copyright (C) 2015 The Gravitee team (http://gravitee.io)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/*
+ * Copyright A.N.S 2022
  */
 package fr.ans.psc;
 
 import io.gravitee.common.http.HttpStatusCode;
+import io.gravitee.gateway.api.ExecutionContext;
 import io.gravitee.gateway.api.Request;
 import io.gravitee.gateway.api.Response;
 import io.gravitee.policy.api.PolicyChain;
@@ -41,11 +30,23 @@ public class GenerateVIHFPolicy {
     }
 
     @OnRequest
-    public void onRequest(Request request, Response response, PolicyChain policyChain) {
-        // Add a dummy header
-        request.headers().set("X-DummyHeader", configuration.getStringParam());
+    public void onRequest(Request request, Response response, ExecutionContext executionContext, PolicyChain policyChain) {
 
-        // Finally continue chaining
+        // TODO récupérer les éléments nécessaires dans les headers & le contexte Gravitee
+        String payload = (String) executionContext.getAttribute("openid.userinfo.payload");
+        String ins = (String) request.headers().getFirst("X-insHeader");
+        String workSituId = (String) request.headers().getFirst("X-workSituationHeader");
+
+        // TODO transformer le payload en un objet UserInfos qu'on puisse parser
+
+        // TODO générer la grappe d'objets custom
+
+        // TODO convertir la grappe en XML
+        String xmlString = "XMLString";
+
+        // ajouter le jeton VIHF généré au contexte gravitee
+        executionContext.setAttribute("VIHF", xmlString);
+        // sortir de l'exécution de la policy
         policyChain.doNext(request, response);
     }
 
