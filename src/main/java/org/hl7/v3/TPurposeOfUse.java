@@ -80,6 +80,18 @@ public class TPurposeOfUse {
     protected String codeSystem;
     @XmlAttribute(name = "code", required = true)
     protected String code;
+    @XmlAttribute(name = "type", namespace = "http://wwww.w3.org/2001/XMLSchema-instance", required = true)
+    protected String type;
+
+    public TPurposeOfUse() {}
+
+    public TPurposeOfUse(boolean isDefault) {
+        this.displayName = "Accès normal";
+        this.codeSystemName = "mode acces VIHF 2.0";
+        this.codeSystem = "1.2.250.1.213.1.1.4.248";
+        this.code = "normal";
+        this.type = "CE";
+    }
 
     /**
      * Obtient la valeur de la propriété displayName.
