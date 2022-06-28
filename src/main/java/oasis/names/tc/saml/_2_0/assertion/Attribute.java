@@ -8,14 +8,7 @@
 
 package oasis.names.tc.saml._2_0.assertion;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
@@ -64,7 +57,7 @@ import javax.xml.bind.annotation.XmlType;
 public class Attribute {
 
     @XmlElement(name = "AttributeValue", required = true)
-    protected List<Object> attributeValue;
+    protected AttributeValue attributeValue;
     @XmlAttribute(name = "Name", required = true)
     protected String name;
 
@@ -90,11 +83,12 @@ public class Attribute {
      * 
      * 
      */
-    public List<Object> getAttributeValue() {
-        if (attributeValue == null) {
-            attributeValue = new ArrayList<Object>();
-        }
+    public AttributeValue getAttributeValue() {
         return this.attributeValue;
+    }
+
+    public void setAttributeValue(AttributeValue value) {
+        this.attributeValue = value;
     }
 
     /**

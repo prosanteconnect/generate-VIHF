@@ -49,7 +49,15 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="AttributeValue"/>
+    <xs:element name="AttributeValue">
+        <xs:complexType>
+            <xs:choice minOccurs="0">
+                <xs:element ref="hl7:Role"/>
+                <xs:element ref="hl7:PurposeOfUse"/>
+
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="AttributeStatement">
         <xs:complexType>
             <xs:sequence>
