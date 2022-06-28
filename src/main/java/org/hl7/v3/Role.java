@@ -60,11 +60,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
+@XmlType(name = "", propOrder = {"type", "code", "codeSystem", "displayName" })
 @XmlRootElement(name = "Role")
 public class Role {
 
-    @XmlAttribute(name = "type", required = true)
+    @XmlAttribute(name = "xmlns", required = true)
+    protected String nameSpace;
+    @XmlAttribute(name = "type", namespace = "http://wwww.w3.org/2001/XMLSchema-instance", required = true)
     protected String type;
     @XmlAttribute(name = "displayName", required = true)
     protected String displayName;
@@ -169,4 +171,11 @@ public class Role {
         this.code = value;
     }
 
+    public String getNameSpace() {
+        return nameSpace;
+    }
+
+    public void setNameSpace(String nameSpace) {
+        this.nameSpace = nameSpace;
+    }
 }
