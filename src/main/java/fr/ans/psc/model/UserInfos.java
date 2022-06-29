@@ -1,25 +1,60 @@
 package fr.ans.psc.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class UserInfos {
 
+    @JsonProperty("Secteur_Activite")
     private String activitySector;
+
+    @JsonProperty("sub")
     private String sub;
+
+    @JsonProperty("email_verified")
     private boolean emailVerified;
+
+    @JsonProperty("SubjectOrganization")
     private String subjectOrganization;
+
+    @JsonProperty("Mode_Acces_Raison")
     private String modeAccesRaison;
+
+    @JsonProperty("preferred_username")
     private String preferredUsername;
+
+    @JsonProperty("given_name")
     private String givenName;
+
+    @JsonProperty("Acces_Regulation_Medicale")
     private String accesregulationMedicale;
+
+    @JsonProperty("UITVersion")
     private String uitVersion;
+
+    @JsonProperty("Palier_Authentification")
     private String palierAuthentification;
+
+    @JsonProperty("SubjectRefPro")
     private SubjectRefPro subjectRefPro;
+
+    @JsonProperty("SubjectOrganizationID")
     private String subjectOrganizationID;
+
+    @JsonProperty("SubjectRole")
     private List<String> subjectRoles;
+
+    @JsonProperty("PSI_Locale")
     private String psiLocale;
+
+    @JsonProperty("otherIds")
     private List<AlternativeIdentifier> otherIds;
+
+    @JsonProperty("SubjectNameID")
     private String subjectNameID;
+
+    @JsonProperty("family_name")
     private String familyName;
 
     public String getActivitySector() {
@@ -156,5 +191,9 @@ public class UserInfos {
 
     public void setFamilyName(String familyName) {
         this.familyName = familyName;
+    }
+
+    public String getSubjectId() {
+        return familyName + " " + givenName + " " + subjectOrganization;
     }
 }
