@@ -4,59 +4,47 @@
 package fr.ans.psc;
 
 import io.gravitee.policy.api.PolicyConfiguration;
-import io.gravitee.common.http.HttpMethod;
 
 @SuppressWarnings("unused")
 public class GenerateVIHFPolicyConfiguration implements PolicyConfiguration {
 
-    /**
-     * A String parameter
-     */
-    private String stringParam = "defaultValue";
+    private String certificateDN;
 
-    /**
-     * A integer parameter
-     */
-    private int integerParam;
+    private String lpsName;
 
-    /**
-     * A integer parameter
-     */
-    private boolean booleanParam;
+    private String lpsVersion;
 
-    /**
-     * An enum parameter
-     */
-    private HttpMethod httpMethod;
+    private String lpsHomologationNumber;
 
-    /**
-     * Get the String parameter
-     *
-     * @return the String parameter
-     */
-    public String getStringParam() {
-        return stringParam;
+    public String getCertificateDN() {
+        return certificateDN;
     }
 
-    /**
-     * Get the integer parameter
-     *
-     * @return the integer parameter
-     */
-    public int getIntegerParam() {
-        return integerParam;
+    public void setCertificateDN(String certificateDN) {
+        this.certificateDN = certificateDN;
     }
 
-    /**
-     * Get the boolean parameter
-     *
-     * @return the boolean parameter
-     */
-    public boolean getBooleanParam() {
-        return booleanParam;
+    public String getLpsName() {
+        return lpsName;
     }
 
-    public HttpMethod getHttpMethod() {
-        return httpMethod;
+    public void setLpsName(String lpsName) {
+        this.lpsName = lpsName;
+    }
+
+    public String getLpsVersion() {
+        return lpsVersion;
+    }
+
+    public void setLpsVersion(String lpsVersion) {
+        this.lpsVersion = lpsVersion;
+    }
+
+    public String getLpsHomologationNumber() {
+        return lpsHomologationNumber;
+    }
+
+    public void setLpsHomologationNumber(String lpsHomologationNumber) {
+        this.lpsHomologationNumber = lpsHomologationNumber;
     }
 }
