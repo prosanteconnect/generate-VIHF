@@ -6,13 +6,13 @@ import java.util.Objects;
 
 public class AlternativeIdentifier {
 
-    @JsonProperty("identifier")
+    @JsonProperty("identifiant")
     private String identifier = null;
 
     @JsonProperty("origine")
     private String origine = null;
 
-    @JsonProperty("quality")
+    @JsonProperty("qualite")
     private Integer quality = null;
 
     public AlternativeIdentifier identifier(String identifier) {

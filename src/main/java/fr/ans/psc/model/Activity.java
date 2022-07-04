@@ -17,13 +17,13 @@ public class Activity {
     @JsonProperty("codeRole")
     private String roleCode = null;
 
-    @JsonProperty("NumeroSiretSite")
+    @JsonProperty("numeroSiretSite")
     private String siretSiteNumber = null;
 
-    @JsonProperty("NumeroSirenSite")
+    @JsonProperty("numeroSirenSite")
     private String sirenSiteNumber = null;
 
-    @JsonProperty("NumeroFinessSite")
+    @JsonProperty("numeroFinessSite")
     private String finessSiteNumber = null;
 
     @JsonProperty("numeroFinessetablissementJuridique")
@@ -80,7 +80,7 @@ public class Activity {
     @JsonProperty("telecopie")
     private String companyFax = null;
 
-    @JsonProperty("adresseEmail")
+    @JsonProperty("adresseEMail")
     private String companyEmail = null;
 
     @JsonProperty("codeDepartement")

@@ -8,11 +8,7 @@
 
 package org.hl7.v3;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
@@ -67,9 +63,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "T_PurposeOfUse")
-@XmlSeeAlso({
-    CE.class
-})
+@XmlRootElement(name = "T_PurposeOfUse")
 public class TPurposeOfUse {
 
     @XmlAttribute(name = "displayName", required = true)

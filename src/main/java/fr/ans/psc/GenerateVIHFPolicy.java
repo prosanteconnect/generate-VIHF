@@ -3,6 +3,8 @@
  */
 package fr.ans.psc;
 
+import fr.ans.psc.model.UserInfos;
+import fr.ans.psc.model.VihfBuilder;
 import io.gravitee.common.http.HttpStatusCode;
 import io.gravitee.gateway.api.ExecutionContext;
 import io.gravitee.gateway.api.Request;
@@ -34,18 +36,21 @@ public class GenerateVIHFPolicy {
 
         // TODO récupérer les éléments nécessaires dans les headers & le contexte Gravitee
         String payload = (String) executionContext.getAttribute("openid.userinfo.payload");
-        String ins = (String) request.headers().getFirst("X-insHeader");
-        String workSituId = (String) request.headers().getFirst("X-workSituationHeader");
+        String structureId = request.headers().getFirst("X-structureIdHeader");
+        String workSituId = request.headers().getFirst("X-workSituationHeader");
+        String ins = request.headers().getFirst("X-insHeader");
 
         // TODO transformer le payload en un objet UserInfos qu'on puisse parser
 
         // TODO générer la grappe d'objets custom
+        UserInfos userInfos = new UserInfos();
 
         // TODO convertir la grappe en XML
-        String xmlString = "XMLString";
+        VihfBuilder vihfBuilder = new VihfBuilder(userInfos, structureId, workSituId, ins, configuration);
+        String vihf = vihfBuilder.generateVIHF();
 
         // ajouter le jeton VIHF généré au contexte gravitee
-        executionContext.setAttribute("VIHF", xmlString);
+        executionContext.setAttribute("VIHF", vihf);
         // sortir de l'exécution de la policy
         policyChain.doNext(request, response);
     }
