@@ -1,0 +1,26 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:fr:ans:psc:GenerateVIHFPolicyConfiguration",
+  "properties" : {
+    "certificateDN" : {
+      "title": "API Proxy certificate DN",
+      "description": "Le DN des certificats d'authentification client et de signature présentés au DMP (ils doivent être identiques).",
+      "type" : "string"
+    },
+    "lpsName" : {
+      "title": "Nom du LPS",
+      "description": "Nom sous lequel l'API Proxy est enregistrée auprès du DMP",
+      "type" : "string"
+    },
+    "lpsVersion" : {
+      "title": "Version du LPS",
+      "description": "Numéro de version de l'API Proxy enregistré auprès du DMP",
+      "type" : "string"
+    },
+    "lpsHomologationNumber" : {
+      "title": "Numéro d'homologation du LPS",
+      "description": "Numéro d'homologation de l'API Proxy auprès du DMP",
+      "type" : "string"
+    }
+  }
+}
