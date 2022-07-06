@@ -3,8 +3,7 @@
  */
 package fr.ans.psc;
 
-import fr.ans.psc.model.UserInfos;
-import fr.ans.psc.model.VihfBuilder;
+import fr.ans.psc.model.prosanteconnect.UserInfos;
 import io.gravitee.common.http.HttpStatusCode;
 import io.gravitee.gateway.api.ExecutionContext;
 import io.gravitee.gateway.api.Request;

@@ -1,4 +1,4 @@
-package fr.ans.psc.model;
+package fr.ans.psc.model.prosanteconnect;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

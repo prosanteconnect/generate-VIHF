@@ -1,8 +1,7 @@
 package fr.ans.psc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.ans.psc.model.UserInfos;
-import fr.ans.psc.model.VihfBuilder;
+import fr.ans.psc.model.prosanteconnect.UserInfos;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -9,6 +9,7 @@
 package oasis.names.tc.saml._2_0.assertion;
 
 import javax.xml.bind.annotation.*;
+import java.util.List;
 
 
 /**
@@ -57,7 +58,7 @@ import javax.xml.bind.annotation.*;
 public class Attribute {
 
     @XmlElement(name = "AttributeValue", required = true)
-    protected AttributeValue attributeValue;
+    protected List<AttributeValue> attributeValue;
     @XmlAttribute(name = "Name", required = true)
     protected String name;
 
@@ -83,11 +84,11 @@ public class Attribute {
      * 
      * 
      */
-    public AttributeValue getAttributeValue() {
+    public List<AttributeValue> getAttributeValue() {
         return this.attributeValue;
     }
 
-    public void setAttributeValue(AttributeValue value) {
+    public void setAttributeValue(List<AttributeValue> value) {
         this.attributeValue = value;
     }
 

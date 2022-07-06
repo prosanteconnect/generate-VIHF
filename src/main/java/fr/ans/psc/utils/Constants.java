@@ -1,4 +1,4 @@
-package fr.ans.psc.model;
+package fr.ans.psc.utils;
 
 public class Constants {
 
@@ -41,8 +41,7 @@ public class Constants {
 
     public static final String SUBJECT_ROLE = "urn:oasis:names:tc:xacml:2.0:subject:role";
 
-    // TODO add delegate Class to xsd & generate authn_class for 2FA
-    public static final String AUTHN_CONTEXT_CLASS_REF = "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified";
+    public static final String AUTHN_CONTEXT_CLASS_REF = "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered";
 
     public static final String DOCTOR_PROFESSION_CODE = "10";
 
