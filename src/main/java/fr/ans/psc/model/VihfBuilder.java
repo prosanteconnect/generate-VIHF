@@ -1,20 +1,25 @@
 package fr.ans.psc.model;
 
 import fr.ans.psc.GenerateVIHFPolicyConfiguration;
+import fr.ans.psc.utils.CustomNamespaceMapper;
 import oasis.names.tc.saml._2_0.assertion.*;
 import org.hl7.v3.TPurposeOfUse;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import static fr.ans.psc.model.Constants.*;
 
 public class VihfBuilder {
+
+    private transient static final Logger LOGGER = Logger.getLogger(VihfBuilder.class.getName());
 
     private oasis.names.tc.saml._2_0.assertion.ObjectFactory assertionFactory;
     private org.hl7.v3.ObjectFactory profilFactory;
@@ -47,6 +52,11 @@ public class VihfBuilder {
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+            try {
+                marshaller.setProperty(NAMESPACE_PREFIX_MAPPER_PACKAGE, new CustomNamespaceMapper());
+            } catch (PropertyException e) {
+                LOGGER.warning("JAXB could not use Custom prefix mapper, will use default");
+            }
 
             StringWriter sw = new StringWriter();
             marshaller.marshal(fetchAssertion(), sw);

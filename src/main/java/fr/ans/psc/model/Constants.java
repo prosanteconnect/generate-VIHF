@@ -48,4 +48,6 @@ public class Constants {
 
     public static final String PHARMACIST_PROFESSION_CODE = "21";
 
+    public static final String NAMESPACE_PREFIX_MAPPER_PACKAGE = "com.sun.xml.bind.namespacePrefixMapper";
+
 }
