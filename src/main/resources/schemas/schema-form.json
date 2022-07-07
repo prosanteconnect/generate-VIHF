@@ -23,7 +23,7 @@
     },
     "lpsHomologationNumber" : {
       "title": "Numéro d'homologation du LPS",
-      "description": "Numéro d'homologation de l'API Proxy auprès du DMP",
+      "description": "Numéro d'homologation de l'API Proxy auprès du DMP.",
       "type" : "string"
     }
   }
