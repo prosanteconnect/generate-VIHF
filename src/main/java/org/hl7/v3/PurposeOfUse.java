@@ -62,9 +62,9 @@ import javax.xml.bind.annotation.*;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "T_PurposeOfUse")
-@XmlRootElement(name = "T_PurposeOfUse")
-public class TPurposeOfUse {
+@XmlType(name = "PurposeOfUse")
+@XmlRootElement(name = "PurposeOfUse")
+public class PurposeOfUse {
 
     @XmlAttribute(name = "displayName", required = true)
     protected String displayName;
@@ -77,9 +77,9 @@ public class TPurposeOfUse {
     @XmlAttribute(name = "type", namespace = "http://wwww.w3.org/2001/XMLSchema-instance", required = true)
     protected String type;
 
-    public TPurposeOfUse() {}
+    public PurposeOfUse() {}
 
-    public TPurposeOfUse(boolean isDefault) {
+    public PurposeOfUse(boolean isDefault) {
         this.displayName = "Accès normal";
         this.codeSystemName = "mode acces VIHF 2.0";
         this.codeSystem = "1.2.250.1.213.1.1.4.248";

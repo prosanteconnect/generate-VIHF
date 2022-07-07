@@ -49,11 +49,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link TPurposeOfUse }
+     * Create an instance of {@link PurposeOfUse }
      * 
      */
-    public TPurposeOfUse createTPurposeOfUse() {
-        return new TPurposeOfUse();
+    public PurposeOfUse createTPurposeOfUse() {
+        return new PurposeOfUse();
     }
 
     /**
@@ -65,16 +65,16 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link TPurposeOfUse }{@code >}
+     * Create an instance of {@link JAXBElement }{@code <}{@link PurposeOfUse }{@code >}
      * 
      * @param value
      *     Java instance representing xml element's value.
      * @return
-     *     the new instance of {@link JAXBElement }{@code <}{@link TPurposeOfUse }{@code >}
+     *     the new instance of {@link JAXBElement }{@code <}{@link PurposeOfUse }{@code >}
      */
     @XmlElementDecl(namespace = "urn:hl7-org:v3", name = "PurposeOfUse")
-    public JAXBElement<TPurposeOfUse> createPurposeOfUse(TPurposeOfUse value) {
-        return new JAXBElement<TPurposeOfUse>(_PurposeOfUse_QNAME, TPurposeOfUse.class, null, value);
+    public JAXBElement<PurposeOfUse> createPurposeOfUse(PurposeOfUse value) {
+        return new JAXBElement<PurposeOfUse>(_PurposeOfUse_QNAME, PurposeOfUse.class, null, value);
     }
 
 }

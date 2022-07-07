@@ -17,12 +17,13 @@ public class VihfBuilderTest {
         UserInfos userInfos = objectMapper.readValue(userInfosMock(), UserInfos.class);
         GenerateVIHFPolicyConfiguration configuration = new GenerateVIHFPolicyConfiguration();
         configuration.setCertificateDN("CN=serviceps.sesam-vitale.fr,OU=339172288100052,O=GIE SESAM VITALE,ST=Sarthe (72),C=FR");
+        configuration.setStructureId("136 788 596 476");
         configuration.setLpsName("PROSANTECONNECT_API_PROXY");
         configuration.setLpsVersion("1.0");
         configuration.setLpsHomologationNumber("123");
 
 
-        VihfBuilder vihfBuilder = new VihfBuilder(userInfos, "136 788 596 476", "10C", "2 88 09 17 202 203 71", configuration);
+        VihfBuilder vihfBuilder = new VihfBuilder(userInfos, "10C", "2 88 09 17 202 203 71", configuration);
 
         assertNotNull(configuration);
         String generatedVihf = vihfBuilder.generateVIHF();
@@ -32,9 +33,6 @@ public class VihfBuilderTest {
         assertNotEquals(null, generatedVihf);
 //        assertEquals(expectedVihf, generatedVihf);
     }
-
-
-
 
     private String userInfosMock() {
         return "{\n" +

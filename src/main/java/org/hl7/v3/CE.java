@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CE")
 public class CE
-    extends TPurposeOfUse
+    extends PurposeOfUse
 {
 
 

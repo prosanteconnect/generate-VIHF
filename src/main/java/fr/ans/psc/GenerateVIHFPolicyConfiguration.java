@@ -10,6 +10,8 @@ public class GenerateVIHFPolicyConfiguration implements PolicyConfiguration {
 
     private String certificateDN;
 
+    private String structureId;
+
     private String lpsName;
 
     private String lpsVersion;
@@ -22,6 +24,14 @@ public class GenerateVIHFPolicyConfiguration implements PolicyConfiguration {
 
     public void setCertificateDN(String certificateDN) {
         this.certificateDN = certificateDN;
+    }
+
+    public String getStructureId() {
+        return structureId;
+    }
+
+    public void setStructureId(String structureId) {
+        this.structureId = structureId;
     }
 
     public String getLpsName() {

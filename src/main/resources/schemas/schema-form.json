@@ -7,14 +7,18 @@
       "description": "Le DN des certificats d'authentification client et de signature présentés au DMP (ils doivent être identiques).",
       "type" : "string"
     },
+    "structureId" : {
+      "title": "API Proxy structure Id",
+      "description": "Identifiant de la structure API Proxy, enregistrée auprès du DMP."
+    },
     "lpsName" : {
       "title": "Nom du LPS",
-      "description": "Nom sous lequel l'API Proxy est enregistrée auprès du DMP",
+      "description": "Nom sous lequel l'API Proxy est enregistrée auprès du DMP.",
       "type" : "string"
     },
     "lpsVersion" : {
       "title": "Version du LPS",
-      "description": "Numéro de version de l'API Proxy enregistré auprès du DMP",
+      "description": "Numéro de version de l'API Proxy enregistré auprès du DMP.",
       "type" : "string"
     },
     "lpsHomologationNumber" : {

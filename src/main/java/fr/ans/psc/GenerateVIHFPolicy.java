@@ -35,7 +35,6 @@ public class GenerateVIHFPolicy {
 
         // TODO récupérer les éléments nécessaires dans les headers & le contexte Gravitee
         String payload = (String) executionContext.getAttribute("openid.userinfo.payload");
-        String structureId = request.headers().getFirst("X-structureIdHeader");
         String workSituId = request.headers().getFirst("X-workSituationHeader");
         String ins = request.headers().getFirst("X-insHeader");
 
@@ -45,7 +44,7 @@ public class GenerateVIHFPolicy {
         UserInfos userInfos = new UserInfos();
 
         // TODO convertir la grappe en XML
-        VihfBuilder vihfBuilder = new VihfBuilder(userInfos, structureId, workSituId, ins, configuration);
+        VihfBuilder vihfBuilder = new VihfBuilder(userInfos, workSituId, ins, configuration);
         String vihf = vihfBuilder.generateVIHF();
 
         // ajouter le jeton VIHF généré au contexte gravitee

@@ -35,10 +35,10 @@
             <Concept code="95" codeSystem="1.2.250.1.71.1.2.7" displayName="Diététicien"/>
             <Concept code="96" codeSystem="1.2.250.1.71.1.2.7" displayName="Psychomotricien"/>
             <Concept code="98" codeSystem="1.2.250.1.71.1.2.7" displayName="Manipulateur ERM"/>
-            <Concept code="10" codeSystem="1.2.250.1.71.1.2.8" displayName="Médecin en formation"/>
-            <Concept code="21" codeSystem="1.2.250.1.71.1.2.8" displayName="Pharmacien en formation"/>
-            <Concept code="40" codeSystem="1.2.250.1.71.1.2.8" displayName="Chirurgien-Dentiste en formation"/>
-            <Concept code="50" codeSystem="1.2.250.1.71.1.2.8" displayName="Sage-Femme en formation"/>
+            <!--<Concept code="10" codeSystem="1.2.250.1.71.1.2.8" displayName="Médecin en formation"/>-->
+            <!--<Concept code="21" codeSystem="1.2.250.1.71.1.2.8" displayName="Pharmacien en formation"/>-->
+            <!--<Concept code="40" codeSystem="1.2.250.1.71.1.2.8" displayName="Chirurgien-Dentiste en formation"/>-->
+            <!--<Concept code="50" codeSystem="1.2.250.1.71.1.2.8" displayName="Sage-Femme en formation"/>-->
             <Concept code="SCD01" codeSystem="1.2.250.1.71.4.2.5" displayName="Orthopédie dento-faciale (SCD)"/>
             <Concept code="SCD02" codeSystem="1.2.250.1.71.4.2.5" displayName="Chirurgie orale (SCD)"/>
             <Concept code="SCD03" codeSystem="1.2.250.1.71.4.2.5" displayName="Médecine bucco-dentaire (SCD)"/>
