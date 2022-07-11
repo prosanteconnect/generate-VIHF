@@ -5,4 +5,61 @@ image:https://ci.gravitee.io/buildStatus/icon?job=gravitee-io/generateVIHF/maste
 image:https://badges.gitter.im/Join Chat.svg["Gitter", link="https://gitter.im/gravitee-io/gravitee-io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"]
 endif::[]
 
-Here you can document your GenerateVIHF Gravitee Policy.
+== Description
+
+La policy GenerateVIHF est conçue pour générer un jeton VIHF non signé, conforme à la spécification du CI-SIS pour une authentification indirecte.
+
+Cette policy requête les UserInfos ProSanteConnect dans le contexte Gravitee. Elle s'articule donc particulièrement avec la policy OpenID Connect - UserInfo.
+
+En sortie, un jeton VIHF est mis à disposition dans le contexte Gravitee, sous forme de chaîne de caractères à l'attribut `vihf.token.payload`.
+
+== Compatibilité avec Gravitee API Management
+
+|===
+|Version du plugin | Version APIM
+
+|1.0 and upper  | 3.18.x to latest
+|===
+
+== Configuration
+
+La policy nécessite de configurer les paramètres suivants :
+
+|===
+| Paramètre | Requis    | Description   | Type  | Défaut
+
+.^|certificateDN
+^.^|Oui
+| Le DN des certificats d'authentification client et de signature présentés au DMP (ils doivent être identiques)
+^.^|chaîne de caractères
+^.^|-
+
+.^|structureId
+^.^|Oui
+|Identifiant de la structure API Proxy, enregistrée auprès du DMP
+^.^|chaîne de caractères
+^.^|-
+
+.^|lpsName
+^.^|Oui
+|Nom sous lequel l'API Proxy est enregistrée auprès du DMP
+^.^|chaîne de caractères
+^.^|-
+
+.^|lpsVersion
+^.^|Oui
+|Numéro de version de l'API Proxy enregistré auprès du DMP
+^.^|chaîne de caractères
+^.^|-
+
+.^|lpsHomologationNumber
+^.^|Oui
+|Numéro d'homologation de l'API Proxy auprès du DMP
+^.^|chaîne de caractères
+^.^|-
+
+|===
+
+
+
+
