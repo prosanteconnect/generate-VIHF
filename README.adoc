@@ -28,31 +28,31 @@ La policy nécessite de configurer les paramètres suivants :
 |===
 | Paramètre | Requis    | Description   | Type  | Défaut
 
-.^|certificateDN
+.^|API Proxy certificate DN
 ^.^|Oui
 | Le DN des certificats d'authentification client et de signature présentés au DMP (ils doivent être identiques)
 ^.^|chaîne de caractères
 ^.^|-
 
-.^|structureId
+.^|API Proxy structure Id
 ^.^|Oui
 |Identifiant de la structure API Proxy, enregistrée auprès du DMP
 ^.^|chaîne de caractères
 ^.^|-
 
-.^|lpsName
+.^|Nom du LPS
 ^.^|Oui
 |Nom sous lequel l'API Proxy est enregistrée auprès du DMP
 ^.^|chaîne de caractères
 ^.^|-
 
-.^|lpsVersion
+.^|Version du LPS
 ^.^|Oui
 |Numéro de version de l'API Proxy enregistré auprès du DMP
 ^.^|chaîne de caractères
 ^.^|-
 
-.^|lpsHomologationNumber
+.^|Numéro d'homologation du LPS
 ^.^|Oui
 |Numéro d'homologation de l'API Proxy auprès du DMP
 ^.^|chaîne de caractères
