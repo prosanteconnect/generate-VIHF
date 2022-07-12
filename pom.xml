@@ -47,6 +47,7 @@
         <maven-assembly-plugin.version>2.5.5</maven-assembly-plugin.version>
 
         <jackson-version>2.8.9</jackson-version>
+        <gravitee-bom.version>2.5</gravitee-bom.version>
     </properties>
 
     <dependencyManagement>
