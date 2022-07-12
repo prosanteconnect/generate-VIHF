@@ -40,12 +40,19 @@ public class GenerateVIHFPolicy {
     public void onRequest(Request request, Response response, ExecutionContext executionContext, PolicyChain policyChain) throws IOException {
 
         String payload = (String) executionContext.getAttribute("openid.userinfo.payload");
-        String workSituId = request.headers().getFirst("X-workSituationHeader");
-        String ins = request.headers().getFirst("X-insHeader");
+        String workSituId = request.headers().get("X-Worksituation");
+        String ins = request.headers().get("X-Ins");
 
-        UserInfos userInfos = objectMapper.readValue(payload, UserInfos.class);
+        UserInfos userInfos =
+//                new UserInfos();
+                objectMapper.readValue(payload, UserInfos.class);
 
-        VihfBuilder vihfBuilder = new VihfBuilder(userInfos, workSituId, ins, configuration);
+        VihfBuilder vihfBuilder = new VihfBuilder(userInfos,
+//                "18",
+                workSituId,
+//                "22",
+                ins,
+                configuration);
         String vihf = vihfBuilder.generateVIHF();
 
         // ajouter le jeton VIHF généré au contexte gravitee
