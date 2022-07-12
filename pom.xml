@@ -55,7 +55,7 @@
             <groupId>io.gravitee.gateway</groupId>
             <artifactId>gravitee-gateway-api</artifactId>
             <version>${gravitee-gateway-api.version}</version>
-            <scope>provided</scope>
+<!--            <scope>provided</scope>-->
         </dependency>
 
         <dependency>
@@ -69,7 +69,7 @@
             <groupId>io.gravitee.common</groupId>
             <artifactId>gravitee-common</artifactId>
             <version>${gravitee-common.version}</version>
-            <scope>provided</scope>
+<!--            <scope>provided</scope>-->
         </dependency>
 
 <!--        <dependency>-->
