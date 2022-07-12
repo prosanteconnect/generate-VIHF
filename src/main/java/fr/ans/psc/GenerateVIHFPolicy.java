@@ -3,6 +3,7 @@
  */
 package fr.ans.psc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import io.gravitee.common.http.HttpStatusCode;
 import io.gravitee.gateway.api.ExecutionContext;
@@ -13,6 +14,8 @@ import io.gravitee.policy.api.PolicyResult;
 import io.gravitee.policy.api.annotations.OnRequest;
 import io.gravitee.policy.api.annotations.OnResponse;
 
+import java.io.IOException;
+
 @SuppressWarnings("unused")
 public class GenerateVIHFPolicy {
 
@@ -21,6 +24,8 @@ public class GenerateVIHFPolicy {
      */
     private GenerateVIHFPolicyConfiguration configuration;
 
+    private ObjectMapper objectMapper;
+
     /**
      * Create a new GenerateVIHF Policy instance based on its associated configuration
      *
@@ -28,27 +33,23 @@ public class GenerateVIHFPolicy {
      */
     public GenerateVIHFPolicy(GenerateVIHFPolicyConfiguration configuration) {
         this.configuration = configuration;
+        this.objectMapper = new ObjectMapper();
     }
 
     @OnRequest
-    public void onRequest(Request request, Response response, ExecutionContext executionContext, PolicyChain policyChain) {
+    public void onRequest(Request request, Response response, ExecutionContext executionContext, PolicyChain policyChain) throws IOException {
 
-        // TODO récupérer les éléments nécessaires dans les headers & le contexte Gravitee
         String payload = (String) executionContext.getAttribute("openid.userinfo.payload");
         String workSituId = request.headers().getFirst("X-workSituationHeader");
         String ins = request.headers().getFirst("X-insHeader");
 
-        // TODO transformer le payload en un objet UserInfos qu'on puisse parser
+        UserInfos userInfos = objectMapper.readValue(payload, UserInfos.class);
 
-        // TODO générer la grappe d'objets custom
-        UserInfos userInfos = new UserInfos();
-
-        // TODO convertir la grappe en XML
         VihfBuilder vihfBuilder = new VihfBuilder(userInfos, workSituId, ins, configuration);
         String vihf = vihfBuilder.generateVIHF();
 
         // ajouter le jeton VIHF généré au contexte gravitee
-        executionContext.setAttribute("VIHF", vihf);
+        executionContext.setAttribute("vihf.token.payload", vihf);
         // sortir de l'exécution de la policy
         policyChain.doNext(request, response);
     }
