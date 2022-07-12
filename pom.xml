@@ -30,14 +30,14 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>20.2</version>
+        <version>8</version>
     </parent>
 
     <properties>
         <java.version>11</java.version>
-        <gravitee-gateway-api.version>1.31.1</gravitee-gateway-api.version>
-        <gravitee-policy-api.version>1.11.0</gravitee-policy-api.version>
-        <gravitee-common.version>1.25.0</gravitee-common.version>
+        <gravitee-gateway-api.version>1.6.0</gravitee-gateway-api.version>
+        <gravitee-policy-api.version>1.2.0</gravitee-policy-api.version>
+        <gravitee-common.version>1.7.0</gravitee-common.version>
         <junit.version>4.12</junit.version>
 
         <json-schema-generator-maven-plugin.version>1.3.0</json-schema-generator-maven-plugin.version>
@@ -47,26 +47,7 @@
         <maven-assembly-plugin.version>2.5.5</maven-assembly-plugin.version>
 
         <jackson-version>2.8.9</jackson-version>
-        <gravitee-bom.version>2.5</gravitee-bom.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- Import bom to properly inherit all dependencies -->
-            <dependency>
-                <groupId>io.gravitee</groupId>
-                <artifactId>gravitee-bom</artifactId>
-                <version>${gravitee-bom.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>io.gravitee.common</groupId>
-                <artifactId>gravitee-common</artifactId>
-                <version>${gravitee-common.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <!-- Provided scope -->
