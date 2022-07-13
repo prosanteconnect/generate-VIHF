@@ -40,8 +40,8 @@ public class GenerateVIHFPolicy {
     public void onRequest(Request request, Response response, ExecutionContext executionContext, PolicyChain policyChain) throws IOException {
 
         String payload = (String) executionContext.getAttribute("openid.userinfo.payload");
-        String workSituId = request.headers().getFirst("X-Worksituation");
-        String ins = request.headers().getFirst("X-Ins");
+        String workSituId = request.headers().get("X-Worksituation");
+        String ins = request.headers().get("X-Ins");
 
         UserInfos userInfos =
 //                new UserInfos();
