@@ -11,6 +11,7 @@ import org.hl7.v3.PurposeOfUse;
 
 import javax.xml.bind.*;
 import java.io.*;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -41,14 +42,14 @@ public class VihfBuilder {
         this.configuration = configuration;
     }
 
-    public String generateVIHF() {
+    public String generateVIHF() throws JAXBException, FileNotFoundException {
         String tokenVIHF = "";
         try {
             JAXBContext context = JAXBContext.newInstance(ObjectFactory.class,
                     org.hl7.v3.ObjectFactory.class);
 
             Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
+            marshaller.setProperty("jaxb.formatted.output", Boolean.FALSE);
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
             try {
                 marshaller.setProperty(NAMESPACE_PREFIX_MAPPER_PACKAGE, new CustomNamespaceMapper());
@@ -61,8 +62,7 @@ public class VihfBuilder {
             tokenVIHF = sw.toString();
 
         } catch (JAXBException | FileNotFoundException e) {
-            // TODO handle Exception properly
-            e.printStackTrace();
+            throw e;
         }
 
         return tokenVIHF;
@@ -102,7 +102,7 @@ public class VihfBuilder {
         attributeStatement.getAttribute().add(fetchAttribute(userInfos.getActivitySector(), SECTEUR_ACTIVITE));
         attributeStatement.getAttribute().add(fetchAttribute(userInfos.getSubjectId(), SUBJECT_ID));
 
-        attributeStatement.getAttribute().add(fetchRoles());
+//        attributeStatement.getAttribute().add(fetchRoles());
         attributeStatement.getAttribute().add(fetchAttribute(VIHF_VERSION_VALUE, VIHF_VERSION));
         attributeStatement.getAttribute().add(fetchAttribute(AUTH_MODE_VALUE, AUTHENTIFICATION_MODE));
 
@@ -183,12 +183,14 @@ public class VihfBuilder {
             JAXBContext context = JAXBContext.newInstance(fr.ans.psc.model.nos.ObjectFactory.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
-            File testFile = new File(Thread.currentThread().getContextClassLoader().getResource("JDV_J65-SubjectRole-DMP.xml").getPath());
-            InputStream inputStream = new FileInputStream(testFile);
+            String folderABsolutePath = VihfBuilder.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+            File nosFileAbsolute = new File(folderABsolutePath, "JDV_J65-SubjectRole-DMP.xml");
+//            File testFile = new File(Thread.currentThread().getContextClassLoader().getResource("JDV_J65-SubjectRole-DMP.xml").getPath());
+            InputStream inputStream = new FileInputStream(nosFileAbsolute);
             RetrieveValueSetResponse retrieveValueSetResponse = (RetrieveValueSetResponse) unmarshaller.unmarshal(inputStream);
 
             retrieveValueSetResponse.getValueSet().getConceptList().getConcept().forEach(concept -> nosMap.put(concept.getCode(), concept));
-        } catch (JAXBException e) {
+        } catch (JAXBException | URISyntaxException e) {
             //TODO handle JAXBException
             e.printStackTrace();
         }

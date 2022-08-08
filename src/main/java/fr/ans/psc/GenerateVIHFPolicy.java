@@ -6,6 +6,7 @@ package fr.ans.psc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import io.gravitee.common.http.HttpStatusCode;
+import io.gravitee.common.http.MediaType;
 import io.gravitee.gateway.api.ExecutionContext;
 import io.gravitee.gateway.api.Request;
 import io.gravitee.gateway.api.Response;
@@ -14,7 +15,10 @@ import io.gravitee.policy.api.PolicyResult;
 import io.gravitee.policy.api.annotations.OnRequest;
 import io.gravitee.policy.api.annotations.OnResponse;
 
+import javax.xml.bind.JAXBException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
 @SuppressWarnings("unused")
 public class GenerateVIHFPolicy {
@@ -43,22 +47,21 @@ public class GenerateVIHFPolicy {
         String workSituId = request.headers().get("X-Worksituation");
         String ins = request.headers().get("X-Ins");
 
-        UserInfos userInfos =
-//                new UserInfos();
-                objectMapper.readValue(payload, UserInfos.class);
+        UserInfos userInfos = objectMapper.readValue(payload, UserInfos.class);
 
-        VihfBuilder vihfBuilder = new VihfBuilder(userInfos,
-//                "18",
-                workSituId,
-//                "22",
-                ins,
-                configuration);
-        String vihf = vihfBuilder.generateVIHF();
+        VihfBuilder vihfBuilder = new VihfBuilder(userInfos, workSituId, ins, configuration);
 
-        // ajouter le jeton VIHF généré au contexte gravitee
-        executionContext.setAttribute("vihf.token.payload", vihf);
-        // sortir de l'exécution de la policy
-        policyChain.doNext(request, response);
+        try {
+            String vihf = vihfBuilder.generateVIHF();
+
+            // ajouter le jeton VIHF généré au contexte gravitee
+            executionContext.setAttribute("vihf.token.payload", vihf);
+            // sortir de l'exécution de la policy
+            policyChain.doNext(request, response);
+        } catch (JAXBException | FileNotFoundException e) {
+            policyChain.failWith(PolicyResult.failure(HttpStatusCode.INTERNAL_SERVER_ERROR_500, Arrays.toString(e.getStackTrace()), MediaType.APPLICATION_JSON));
+        }
+
     }
 
     @OnResponse

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import org.junit.Test;
 
+import javax.xml.bind.JAXBException;
 import java.io.IOException;
 
 import static org.junit.Assert.assertNotEquals;
@@ -12,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 public class VihfBuilderTest {
 
     @Test
-    public void generateVIHFTest() throws IOException {
+    public void generateVIHFTest() throws IOException, JAXBException {
         ObjectMapper objectMapper = new ObjectMapper();
         UserInfos userInfos = objectMapper.readValue(userInfosMock(), UserInfos.class);
         GenerateVIHFPolicyConfiguration configuration = new GenerateVIHFPolicyConfiguration();
