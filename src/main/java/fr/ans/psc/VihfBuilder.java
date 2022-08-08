@@ -96,13 +96,13 @@ public class VihfBuilder {
         return subject;
     }
 
-    private AttributeStatement fetchAttributeStatement() throws FileNotFoundException {
+    private AttributeStatement fetchAttributeStatement() {
         AttributeStatement attributeStatement = assertionFactory.createAttributeStatement();
         attributeStatement.getAttribute().add(fetchAttribute(configuration.getStructureId(), IDENTIFIANT_STRUCTURE));
         attributeStatement.getAttribute().add(fetchAttribute(userInfos.getActivitySector(), SECTEUR_ACTIVITE));
         attributeStatement.getAttribute().add(fetchAttribute(userInfos.getSubjectId(), SUBJECT_ID));
 
-//        attributeStatement.getAttribute().add(fetchRoles());
+        attributeStatement.getAttribute().add(fetchRoles());
         attributeStatement.getAttribute().add(fetchAttribute(VIHF_VERSION_VALUE, VIHF_VERSION));
         attributeStatement.getAttribute().add(fetchAttribute(AUTH_MODE_VALUE, AUTHENTIFICATION_MODE));
 
@@ -129,25 +129,32 @@ public class VihfBuilder {
         return attribute;
     }
 
-    private Attribute fetchRoles() throws FileNotFoundException {
+    private Attribute fetchRoles() {
         Practice exercicePro = userInfos.getSubjectRefPro().getExercices().stream().filter(practice ->
                 workSituationId.equals(practice.getProfessionCode() + practice.getProfessionalCategoryCode())).findFirst().get();
 
-        Map<String, Concept> nosMap = retrieveNosDMPSubjectRoleMap();
+        try {
+            Map<String, Concept> nosMap = retrieveNosDMPSubjectRoleMap();
 
-        Attribute roleAttribute = assertionFactory.createAttribute();
-        roleAttribute.setName(SUBJECT_ROLE);
-        List<AttributeValue> attributeValues = new ArrayList<>();
+            Attribute roleAttribute = assertionFactory.createAttribute();
+            roleAttribute.setName(SUBJECT_ROLE);
+            List<AttributeValue> attributeValues = new ArrayList<>();
 
-        attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getProfessionCode()));
+            attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getProfessionCode()));
 
-        if (userInfos.getSubjectRefPro().getExercices().stream().anyMatch(practice ->
-                        practice.getProfessionCode().equals(DOCTOR_PROFESSION_CODE) || practice.getProfessionCode().equals(PHARMACIST_PROFESSION_CODE))) {
-            attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getExpertiseCode()));
+            if (userInfos.getSubjectRefPro().getExercices().stream().anyMatch(practice ->
+                    practice.getProfessionCode().equals(DOCTOR_PROFESSION_CODE) || practice.getProfessionCode().equals(PHARMACIST_PROFESSION_CODE))) {
+                attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getExpertiseCode()));
+            }
+
+            roleAttribute.setAttributeValue(attributeValues);
+            return roleAttribute;
+
+        } catch (FileNotFoundException e) {
+            LOGGER.severe("NOS referential has not been found");
+            LOGGER.severe(e.getLocalizedMessage());
+            return null;
         }
-
-        roleAttribute.setAttributeValue(attributeValues);
-        return roleAttribute;
     }
 
     private AttributeValue getRoleAttributeValue(Map<String, Concept> nosMap, String code) {
@@ -183,9 +190,8 @@ public class VihfBuilder {
             JAXBContext context = JAXBContext.newInstance(fr.ans.psc.model.nos.ObjectFactory.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
-            String folderABsolutePath = VihfBuilder.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-            File nosFileAbsolute = new File(folderABsolutePath, "JDV_J65-SubjectRole-DMP.xml");
-//            File testFile = new File(Thread.currentThread().getContextClassLoader().getResource("JDV_J65-SubjectRole-DMP.xml").getPath());
+            String folderAbsolutePath = VihfBuilder.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+            File nosFileAbsolute = new File(folderAbsolutePath, "JDV_J65-SubjectRole-DMP.xml");
             InputStream inputStream = new FileInputStream(nosFileAbsolute);
             RetrieveValueSetResponse retrieveValueSetResponse = (RetrieveValueSetResponse) unmarshaller.unmarshal(inputStream);
 
@@ -194,7 +200,6 @@ public class VihfBuilder {
             //TODO handle JAXBException
             e.printStackTrace();
         }
-        //TODO handle FIleNotFoundException properly
         return nosMap;
     }
 }
