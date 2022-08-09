@@ -1,9 +1,11 @@
 package fr.ans.psc.model.prosanteconnect;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Activity {
     @JsonProperty("codeModeExercice")
     private String professionalModeCode = null;
@@ -91,6 +93,17 @@ public class Activity {
 
     @JsonProperty("autoriteDenregistrement")
     private String companyRegistrationAuthority = null;
+
+    @JsonProperty("codeGenreActivite")
+    private String activityKindCode = null;
+
+    public String getActivityKindCode() {
+        return activityKindCode;
+    }
+
+    public void setActivityKindCode(String activityKindCode) {
+        this.activityKindCode = activityKindCode;
+    }
 
     public Activity professionalModeCode(String professionalModeCode) {
         this.professionalModeCode = professionalModeCode;
