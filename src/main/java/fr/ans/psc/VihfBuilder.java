@@ -1,17 +1,18 @@
 package fr.ans.psc;
 
+import fr.ans.psc.exception.JaxbMarshallingException;
+import fr.ans.psc.exception.NosReferentialRetrievingException;
 import fr.ans.psc.model.nos.Concept;
 import fr.ans.psc.model.nos.RetrieveValueSetResponse;
 import fr.ans.psc.model.prosanteconnect.Practice;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import fr.ans.psc.utils.CustomNamespaceMapper;
 import oasis.names.tc.saml._2_0.assertion.*;
-import org.hl7.v3.Role;
 import org.hl7.v3.PurposeOfUse;
+import org.hl7.v3.Role;
 
 import javax.xml.bind.*;
 import java.io.*;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -42,7 +43,7 @@ public class VihfBuilder {
         this.configuration = configuration;
     }
 
-    public String generateVIHF() throws JAXBException, FileNotFoundException {
+    public String generateVIHF() {
         String tokenVIHF = "";
         try {
             JAXBContext context = JAXBContext.newInstance(ObjectFactory.class,
@@ -61,14 +62,16 @@ public class VihfBuilder {
             marshaller.marshal(fetchAssertion(), sw);
             tokenVIHF = sw.toString();
 
-        } catch (JAXBException | FileNotFoundException e) {
-            throw e;
+        } catch (JAXBException e) {
+            LOGGER.severe("Could not marshall assertion");
+            LOGGER.severe(Arrays.toString(e.getStackTrace()));
+            throw new JaxbMarshallingException("Could not marshall assertion", e);
         }
 
         return tokenVIHF;
     }
 
-    private Assertion fetchAssertion() throws FileNotFoundException {
+    private Assertion fetchAssertion() {
         Assertion assertion = assertionFactory.createAssertion();
         assertion.setIssuer(fetchIssuer());
         assertion.setIssueInstant(dateNow);
@@ -133,28 +136,21 @@ public class VihfBuilder {
         Practice exercicePro = userInfos.getSubjectRefPro().getExercices().stream().filter(practice ->
                 workSituationId.equals(practice.getProfessionCode() + practice.getProfessionalCategoryCode())).findFirst().get();
 
-        try {
-            Map<String, Concept> nosMap = retrieveNosDMPSubjectRoleMap();
+        Map<String, Concept> nosMap = retrieveNosDMPSubjectRoleMap();
 
-            Attribute roleAttribute = assertionFactory.createAttribute();
-            roleAttribute.setName(SUBJECT_ROLE);
-            List<AttributeValue> attributeValues = new ArrayList<>();
+        Attribute roleAttribute = assertionFactory.createAttribute();
+        roleAttribute.setName(SUBJECT_ROLE);
+        List<AttributeValue> attributeValues = new ArrayList<>();
 
-            attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getProfessionCode()));
+        attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getProfessionCode()));
 
-            if (userInfos.getSubjectRefPro().getExercices().stream().anyMatch(practice ->
-                    practice.getProfessionCode().equals(DOCTOR_PROFESSION_CODE) || practice.getProfessionCode().equals(PHARMACIST_PROFESSION_CODE))) {
-                attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getExpertiseCode()));
-            }
-
-            roleAttribute.setAttributeValue(attributeValues);
-            return roleAttribute;
-
-        } catch (FileNotFoundException e) {
-            LOGGER.severe("NOS referential has not been found");
-            LOGGER.severe(e.getLocalizedMessage());
-            return null;
+        if (userInfos.getSubjectRefPro().getExercices().stream().anyMatch(practice ->
+                practice.getProfessionCode().equals(DOCTOR_PROFESSION_CODE) || practice.getProfessionCode().equals(PHARMACIST_PROFESSION_CODE))) {
+            attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getExpertiseCode()));
         }
+
+        roleAttribute.setAttributeValue(attributeValues);
+        return roleAttribute;
     }
 
     private AttributeValue getRoleAttributeValue(Map<String, Concept> nosMap, String code) {
@@ -184,21 +180,27 @@ public class VihfBuilder {
         return authnContext;
     }
 
-    private Map<String, Concept> retrieveNosDMPSubjectRoleMap() throws FileNotFoundException {
+    private Map<String, Concept> retrieveNosDMPSubjectRoleMap() throws NosReferentialRetrievingException {
         Map<String, Concept> nosMap = new HashMap();
         try {
             JAXBContext context = JAXBContext.newInstance(fr.ans.psc.model.nos.ObjectFactory.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
-            String folderAbsolutePath = VihfBuilder.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-            File nosFileAbsolute = new File(folderAbsolutePath, "JDV_J65-SubjectRole-DMP.xml");
-            InputStream inputStream = new FileInputStream(nosFileAbsolute);
+            String nosFileAbsolutePath = Thread.currentThread().getContextClassLoader().getResource("JDV_J65-SubjectRole-DMP.xml").getPath();
+            File nosFile = new File(nosFileAbsolutePath);
+            InputStream inputStream = new FileInputStream(nosFile);
             RetrieveValueSetResponse retrieveValueSetResponse = (RetrieveValueSetResponse) unmarshaller.unmarshal(inputStream);
 
-            retrieveValueSetResponse.getValueSet().getConceptList().getConcept().forEach(concept -> nosMap.put(concept.getCode(), concept));
-        } catch (JAXBException | URISyntaxException e) {
-            //TODO handle JAXBException
-            e.printStackTrace();
+            retrieveValueSetResponse.getValueSet().getConceptList().getConcept().forEach(concept -> {
+                LOGGER.info(concept.toString());
+                nosMap.put(concept.getCode(), concept);
+            });
+        } catch (JAXBException e) {
+            LOGGER.severe("JAXB exception occurred when unmarshalling NOS referential");
+            throw new NosReferentialRetrievingException("JAXB exception occurred when unmarshalling NOS referential", e);
+        } catch (FileNotFoundException e) {
+            LOGGER.severe("Could not find NOS referential");
+            throw new NosReferentialRetrievingException("Could not find NOS referential", e);
         }
         return nosMap;
     }

@@ -15,8 +15,6 @@ import io.gravitee.policy.api.PolicyResult;
 import io.gravitee.policy.api.annotations.OnRequest;
 import io.gravitee.policy.api.annotations.OnResponse;
 
-import javax.xml.bind.JAXBException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -58,7 +56,7 @@ public class GenerateVIHFPolicy {
             executionContext.setAttribute("vihf.token.payload", vihf);
             // sortir de l'exécution de la policy
             policyChain.doNext(request, response);
-        } catch (JAXBException | FileNotFoundException e) {
+        } catch (Exception e) {
             policyChain.failWith(PolicyResult.failure(HttpStatusCode.INTERNAL_SERVER_ERROR_500, Arrays.toString(e.getStackTrace()), MediaType.APPLICATION_JSON));
         }
 
