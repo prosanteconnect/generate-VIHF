@@ -6,7 +6,6 @@ package fr.ans.psc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import io.gravitee.common.http.HttpStatusCode;
-import io.gravitee.common.http.MediaType;
 import io.gravitee.gateway.api.ExecutionContext;
 import io.gravitee.gateway.api.Request;
 import io.gravitee.gateway.api.Response;
@@ -16,7 +15,6 @@ import io.gravitee.policy.api.annotations.OnRequest;
 import io.gravitee.policy.api.annotations.OnResponse;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 @SuppressWarnings("unused")
 public class GenerateVIHFPolicy {
@@ -57,7 +55,7 @@ public class GenerateVIHFPolicy {
             // sortir de l'exécution de la policy
             policyChain.doNext(request, response);
         } catch (Exception e) {
-            policyChain.failWith(PolicyResult.failure(HttpStatusCode.INTERNAL_SERVER_ERROR_500, Arrays.toString(e.getStackTrace()), MediaType.APPLICATION_JSON));
+            policyChain.failWith(PolicyResult.failure("Something went wrong when generating VIHF token"));
         }
 
     }
