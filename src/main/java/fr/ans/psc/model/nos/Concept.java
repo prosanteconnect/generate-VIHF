@@ -223,4 +223,8 @@ public class Concept {
         this.code = value;
     }
 
+    public String toString() {
+        return "Code: " + getCode() + ", CodeSystem : " + getCodeSystem() + ", DisplayName : " + getDisplayName();
+    }
+
 }
