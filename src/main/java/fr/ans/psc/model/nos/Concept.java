@@ -148,7 +148,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {"code", "codeSystem", "displayName"})
+@XmlType(name = "Concept", propOrder = {"code", "codeSystem", "displayName"})
 @XmlRootElement(name = "Concept")
 public class Concept {
 

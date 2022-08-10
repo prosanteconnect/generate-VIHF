@@ -16,59 +16,50 @@ import static org.junit.Assert.assertEquals;
 public class RetrieveNosConceptMapTest {
 
     @Test
-    public void nosProfessionsReferentialTest() throws FileNotFoundException {
+    public void nosProfessionsReferentialTest() throws FileNotFoundException, JAXBException {
 
-        try {
-            JAXBContext context = JAXBContext.newInstance(fr.ans.psc.model.nos.ObjectFactory.class);
+        JAXBContext context = JAXBContext.newInstance(fr.ans.psc.model.nos.ObjectFactory.class);
 
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            File testFile = new File(Thread.currentThread().getContextClassLoader().getResource("JDV_J65-SubjectRole-DMP.xml").getPath());
-            InputStream inputStream = new FileInputStream(testFile);
-            RetrieveValueSetResponse retrieveValueSetResponse = (RetrieveValueSetResponse) unmarshaller.unmarshal(inputStream);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        File testFile = new File(Thread.currentThread().getContextClassLoader().getResource("JDV_J65-SubjectRole-DMP.xml").getPath());
+        InputStream inputStream = new FileInputStream(testFile);
+        RetrieveValueSetResponse retrieveValueSetResponse = (RetrieveValueSetResponse) unmarshaller.unmarshal(inputStream);
 
-            Map<String, Concept> nosMap = new HashMap();
-            retrieveValueSetResponse.getValueSet().getConceptList().getConcept().forEach(concept -> nosMap.put(concept.getCode(), concept));
+        Map<String, Concept> nosMap = new HashMap();
+        retrieveValueSetResponse.getValueSet().getConceptList().getConcept().forEach(concept -> nosMap.put(concept.getCode(), concept));
 
-            assertEquals("10", nosMap.get("10").getCode());
-            assertEquals("1.2.250.1.71.1.2.7", nosMap.get("10").getCodeSystem());
-            assertEquals("Médecin", nosMap.get("10").getDisplayName());
+        assertEquals("10", nosMap.get("10").getCode());
+        assertEquals("1.2.250.1.71.1.2.7", nosMap.get("10").getCodeSystem());
+        assertEquals("Médecin", nosMap.get("10").getDisplayName());
 
-            assertEquals("96", nosMap.get("96").getCode());
-            assertEquals("1.2.250.1.71.1.2.7", nosMap.get("96").getCodeSystem());
-            assertEquals("Psychomotricien", nosMap.get("96").getDisplayName());
+        assertEquals("96", nosMap.get("96").getCode());
+        assertEquals("1.2.250.1.71.1.2.7", nosMap.get("96").getCodeSystem());
+        assertEquals("Psychomotricien", nosMap.get("96").getDisplayName());
 
-            assertEquals("SM06", nosMap.get("SM06").getCode());
-            assertEquals("1.2.250.1.71.4.2.5", nosMap.get("SM06").getCodeSystem());
-            assertEquals("Chirurgie maxillo-faciale (SM)", nosMap.get("SM06").getDisplayName());
-
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
+        assertEquals("SM06", nosMap.get("SM06").getCode());
+        assertEquals("1.2.250.1.71.4.2.5", nosMap.get("SM06").getCodeSystem());
+        assertEquals("Chirurgie maxillo-faciale (SM)", nosMap.get("SM06").getDisplayName());
     }
 
     @Test
-    public void nosSavoirFaireRassReferentialTest() throws FileNotFoundException {
-        try {
-            JAXBContext context = JAXBContext.newInstance(fr.ans.psc.model.nos.ObjectFactory.class);
+    public void nosSavoirFaireRassReferentialTest() throws FileNotFoundException, JAXBException {
 
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            File testFile = new File(Thread.currentThread().getContextClassLoader().getResource("JDV_J65-SubjectRole-DMP.xml").getPath());
-            InputStream inputStream = new FileInputStream(testFile);
-            RetrieveValueSetResponse retrieveValueSetResponse = (RetrieveValueSetResponse) unmarshaller.unmarshal(inputStream);
+        JAXBContext context = JAXBContext.newInstance(fr.ans.psc.model.nos.ObjectFactory.class);
 
-            Map<String, Concept> nosMap = new HashMap();
-            retrieveValueSetResponse.getValueSet().getConceptList().getConcept().forEach(concept -> nosMap.put(concept.getCode(), concept));
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        File testFile = new File(Thread.currentThread().getContextClassLoader().getResource("JDV_J65-SubjectRole-DMP.xml").getPath());
+        InputStream inputStream = new FileInputStream(testFile);
+        RetrieveValueSetResponse retrieveValueSetResponse = (RetrieveValueSetResponse) unmarshaller.unmarshal(inputStream);
 
-            assertEquals("SM26", nosMap.get("SM26").getCode());
-            assertEquals("1.2.250.1.71.4.2.5", nosMap.get("SM26").getCodeSystem());
-            assertEquals("Qualifié en médecine générale (SM)", nosMap.get("SM26").getDisplayName());
+        Map<String, Concept> nosMap = new HashMap();
+        retrieveValueSetResponse.getValueSet().getConceptList().getConcept().forEach(concept -> nosMap.put(concept.getCode(), concept));
 
-            assertEquals("C60", nosMap.get("C60").getCode());
-            assertEquals("1.2.250.1.71.4.2.5", nosMap.get("C60").getCodeSystem());
-            assertEquals("Médecine physique et réadaptation (C)", nosMap.get("C60").getDisplayName());
+        assertEquals("SM26", nosMap.get("SM26").getCode());
+        assertEquals("1.2.250.1.71.4.2.5", nosMap.get("SM26").getCodeSystem());
+        assertEquals("Qualifié en médecine générale (SM)", nosMap.get("SM26").getDisplayName());
 
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
+        assertEquals("C60", nosMap.get("C60").getCode());
+        assertEquals("1.2.250.1.71.4.2.5", nosMap.get("C60").getCodeSystem());
+        assertEquals("Médecine physique et réadaptation (C)", nosMap.get("C60").getDisplayName());
     }
 }
