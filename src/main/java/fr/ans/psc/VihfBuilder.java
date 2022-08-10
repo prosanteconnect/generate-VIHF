@@ -191,10 +191,8 @@ public class VihfBuilder {
             InputStream inputStream = new FileInputStream(nosFile);
             RetrieveValueSetResponse retrieveValueSetResponse = (RetrieveValueSetResponse) unmarshaller.unmarshal(inputStream);
 
-            retrieveValueSetResponse.getValueSet().getConceptList().getConcept().forEach(concept -> {
-                LOGGER.info(concept.toString());
-                nosMap.put(concept.getCode(), concept);
-            });
+            retrieveValueSetResponse.getValueSet().getConceptList().getConcept().forEach(concept -> nosMap.put(concept.getCode(), concept));
+
         } catch (JAXBException e) {
             LOGGER.severe("JAXB exception occurred when unmarshalling NOS referential");
             throw new NosReferentialRetrievingException("JAXB exception occurred when unmarshalling NOS referential", e);
