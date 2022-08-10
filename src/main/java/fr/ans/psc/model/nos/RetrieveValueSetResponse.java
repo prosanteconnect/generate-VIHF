@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.*;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
+@XmlType(name = "", namespace = "urn:ihe:iti:svs:2008", propOrder = {
     "valueSet"
 })
 @XmlRootElement(name = "RetrieveValueSetResponse", namespace = "urn:ihe:iti:svs:2008")
