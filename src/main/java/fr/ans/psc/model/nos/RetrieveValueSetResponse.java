@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.*;
 @XmlType(name = "", propOrder = {
     "valueSet"
 })
-@XmlRootElement(name = "RetrieveValueSetResponse")
+@XmlRootElement(name = "RetrieveValueSetResponse", namespace = "urn:ihe:iti:svs:2008")
 public class RetrieveValueSetResponse {
 
     @XmlElement(name = "ValueSet", required = true)
