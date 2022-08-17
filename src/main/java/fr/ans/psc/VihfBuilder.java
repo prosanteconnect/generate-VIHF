@@ -10,18 +10,18 @@ import fr.ans.psc.utils.CustomNamespaceMapper;
 import oasis.names.tc.saml._2_0.assertion.*;
 import org.hl7.v3.PurposeOfUse;
 import org.hl7.v3.Role;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
 
 import static fr.ans.psc.utils.Constants.*;
 
 public class VihfBuilder {
 
-    private transient static final Logger LOGGER = Logger.getLogger(VihfBuilder.class.getName());
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(VihfBuilder.class);
 
     private oasis.names.tc.saml._2_0.assertion.ObjectFactory assertionFactory;
     private org.hl7.v3.ObjectFactory profilFactory;
@@ -52,19 +52,17 @@ public class VihfBuilder {
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty("jaxb.formatted.output", Boolean.FALSE);
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            try {
-                marshaller.setProperty(NAMESPACE_PREFIX_MAPPER_PACKAGE, new CustomNamespaceMapper());
-            } catch (PropertyException e) {
-                LOGGER.warning("JAXB could not use Custom prefix mapper, will use default");
-            }
+            marshaller.setProperty(NAMESPACE_PREFIX_MAPPER_PACKAGE, new CustomNamespaceMapper());
 
             StringWriter sw = new StringWriter();
             marshaller.marshal(fetchAssertion(), sw);
             tokenVIHF = sw.toString();
 
+        } catch (PropertyException e) {
+            log.warn("JAXB could not use Custom prefix mapper, will use default");
+
         } catch (JAXBException e) {
-            LOGGER.severe("Could not marshall assertion");
-            LOGGER.severe(Arrays.toString(e.getStackTrace()));
+            log.error("Could not marshall assertion", e);
             throw new JaxbMarshallingException("Could not marshall assertion", e);
         }
 
@@ -194,10 +192,10 @@ public class VihfBuilder {
             retrieveValueSetResponse.getValueSet().getConceptList().getConcept().forEach(concept -> nosMap.put(concept.getCode(), concept));
 
         } catch (JAXBException e) {
-            LOGGER.severe("JAXB exception occurred when unmarshalling NOS referential");
+            log.error("JAXB exception occurred when unmarshalling NOS referential", e);
             throw new NosReferentialRetrievingException("JAXB exception occurred when unmarshalling NOS referential", e);
         } catch (FileNotFoundException e) {
-            LOGGER.severe("Could not find NOS referential");
+            log.error("Could not find NOS referential", e);
             throw new NosReferentialRetrievingException("Could not find NOS referential", e);
         }
         return nosMap;

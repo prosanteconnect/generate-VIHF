@@ -13,18 +13,21 @@ import io.gravitee.policy.api.PolicyChain;
 import io.gravitee.policy.api.PolicyResult;
 import io.gravitee.policy.api.annotations.OnRequest;
 import io.gravitee.policy.api.annotations.OnResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 @SuppressWarnings("unused")
 public class GenerateVIHFPolicy {
 
+    private final Logger log = LoggerFactory.getLogger(GenerateVIHFPolicy.class);
     /**
      * The associated configuration to this GenerateVIHF Policy
      */
-    private GenerateVIHFPolicyConfiguration configuration;
+    private final GenerateVIHFPolicyConfiguration configuration;
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     /**
      * Create a new GenerateVIHF Policy instance based on its associated configuration
@@ -55,6 +58,7 @@ public class GenerateVIHFPolicy {
             // sortir de l'exécution de la policy
             policyChain.doNext(request, response);
         } catch (Exception e) {
+            log.error("Something went wrong when generating VIHF token", e);
             policyChain.failWith(PolicyResult.failure("Something went wrong when generating VIHF token"));
         }
 
