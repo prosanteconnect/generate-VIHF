@@ -4,6 +4,7 @@
 package fr.ans.psc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.ans.psc.exception.WrongWorkSituationKeyException;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import io.gravitee.common.http.HttpStatusCode;
 import io.gravitee.gateway.api.ExecutionContext;
@@ -57,6 +58,8 @@ public class GenerateVIHFPolicy {
             executionContext.setAttribute("vihf.token.payload", vihf);
             // sortir de l'exécution de la policy
             policyChain.doNext(request, response);
+        } catch (WrongWorkSituationKeyException e) {
+            policyChain.failWith(PolicyResult.failure(HttpStatusCode.BAD_REQUEST_400, e.getMessage()));
         } catch (Exception e) {
             log.error("Something went wrong when generating VIHF token", e);
             policyChain.failWith(PolicyResult.failure("Something went wrong when generating VIHF token"));

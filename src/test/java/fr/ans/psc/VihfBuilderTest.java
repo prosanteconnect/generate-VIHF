@@ -1,6 +1,7 @@
 package fr.ans.psc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.ans.psc.exception.WrongWorkSituationKeyException;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import oasis.names.tc.saml._2_0.assertion.Assertion;
 import org.junit.Test;
@@ -18,7 +19,7 @@ import static org.junit.Assert.*;
 public class VihfBuilderTest {
 
     @Test
-    public void generateVIHFTest() throws IOException, JAXBException {
+    public void generateVIHFTest() throws IOException, WrongWorkSituationKeyException {
         ObjectMapper objectMapper = new ObjectMapper();
         UserInfos userInfos = objectMapper.readValue(userInfosMock(), UserInfos.class);
         GenerateVIHFPolicyConfiguration configuration = new GenerateVIHFPolicyConfiguration();

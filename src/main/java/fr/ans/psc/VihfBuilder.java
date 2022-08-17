@@ -2,6 +2,7 @@ package fr.ans.psc;
 
 import fr.ans.psc.exception.JaxbMarshallingException;
 import fr.ans.psc.exception.NosReferentialRetrievingException;
+import fr.ans.psc.exception.WrongWorkSituationKeyException;
 import fr.ans.psc.model.nos.Concept;
 import fr.ans.psc.model.nos.RetrieveValueSetResponse;
 import fr.ans.psc.model.prosanteconnect.Practice;
@@ -43,7 +44,7 @@ public class VihfBuilder {
         this.configuration = configuration;
     }
 
-    public String generateVIHF() {
+    public String generateVIHF() throws WrongWorkSituationKeyException {
         String tokenVIHF = "";
         try {
             JAXBContext context = JAXBContext.newInstance(ObjectFactory.class,
@@ -69,7 +70,7 @@ public class VihfBuilder {
         return tokenVIHF;
     }
 
-    private Assertion fetchAssertion() {
+    private Assertion fetchAssertion() throws WrongWorkSituationKeyException {
         Assertion assertion = assertionFactory.createAssertion();
         assertion.setIssuer(fetchIssuer());
         assertion.setIssueInstant(dateNow);
@@ -97,7 +98,7 @@ public class VihfBuilder {
         return subject;
     }
 
-    private AttributeStatement fetchAttributeStatement() {
+    private AttributeStatement fetchAttributeStatement() throws WrongWorkSituationKeyException {
         AttributeStatement attributeStatement = assertionFactory.createAttributeStatement();
         attributeStatement.getAttribute().add(fetchAttribute(configuration.getStructureId(), IDENTIFIANT_STRUCTURE));
         attributeStatement.getAttribute().add(fetchAttribute(userInfos.getActivitySector(), SECTEUR_ACTIVITE));
@@ -130,10 +131,8 @@ public class VihfBuilder {
         return attribute;
     }
 
-    private Attribute fetchRoles() {
-        Practice exercicePro = userInfos.getSubjectRefPro().getExercices().stream().filter(practice ->
-                workSituationId.equals(practice.getProfessionCode() + practice.getProfessionalCategoryCode())).findFirst().get();
-
+    private Attribute fetchRoles() throws WrongWorkSituationKeyException {
+        Practice exercicePro = getExercicePro(userInfos.getSubjectRefPro().getExercices(), workSituationId);
         Map<String, Concept> nosMap = retrieveNosDMPSubjectRoleMap();
 
         Attribute roleAttribute = assertionFactory.createAttribute();
@@ -149,6 +148,18 @@ public class VihfBuilder {
 
         roleAttribute.setAttributeValue(attributeValues);
         return roleAttribute;
+    }
+
+    private Practice getExercicePro(List<Practice> exercices, String workSituationKey) throws WrongWorkSituationKeyException {
+        try {
+            return exercices.size() > 1 ?
+                    exercices.stream().filter(practice ->
+                            workSituationKey.equals(practice.getProfessionCode() + practice.getProfessionalCategoryCode())).findFirst().get() :
+                    exercices.get(0);
+        } catch (NoSuchElementException e) {
+            throw new WrongWorkSituationKeyException("Wrong WorkSituationKey : practice designed by " + workSituationKey + " key submitted in request but absent in UserInfos", e);
+        }
+
     }
 
     private AttributeValue getRoleAttributeValue(Map<String, Concept> nosMap, String code) {
