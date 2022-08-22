@@ -11,6 +11,7 @@ import fr.ans.psc.utils.CustomNamespaceMapper;
 import oasis.names.tc.saml._2_0.assertion.*;
 import org.hl7.v3.PurposeOfUse;
 import org.hl7.v3.Role;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.Security;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.*;
@@ -24,6 +25,7 @@ public class VihfBuilder {
 
     private final org.slf4j.Logger log = LoggerFactory.getLogger(VihfBuilder.class);
 
+    private org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ObjectFactory securityFactory;
     private oasis.names.tc.saml._2_0.assertion.ObjectFactory assertionFactory;
     private org.hl7.v3.ObjectFactory profilFactory;
     private String dateNow;
@@ -35,6 +37,7 @@ public class VihfBuilder {
 
     public VihfBuilder(UserInfos userInfos, String workSituationId, String patientINS,
                        GenerateVIHFPolicyConfiguration configuration) {
+        securityFactory = new org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ObjectFactory();
         assertionFactory = new oasis.names.tc.saml._2_0.assertion.ObjectFactory();
         profilFactory = new org.hl7.v3.ObjectFactory();
         dateNow = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date());
@@ -47,7 +50,9 @@ public class VihfBuilder {
     public String generateVIHF() throws WrongWorkSituationKeyException {
         String tokenVIHF = "";
         try {
-            JAXBContext context = JAXBContext.newInstance(ObjectFactory.class,
+            JAXBContext context = JAXBContext.newInstance(
+                    org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ObjectFactory.class,
+                    ObjectFactory.class,
                     org.hl7.v3.ObjectFactory.class);
 
             Marshaller marshaller = context.createMarshaller();
@@ -56,7 +61,7 @@ public class VihfBuilder {
             marshaller.setProperty(NAMESPACE_PREFIX_MAPPER_PACKAGE, new CustomNamespaceMapper());
 
             StringWriter sw = new StringWriter();
-            marshaller.marshal(fetchAssertion(), sw);
+            marshaller.marshal(fetchSamlSecurity(), sw);
             tokenVIHF = sw.toString();
 
         } catch (PropertyException e) {
@@ -68,6 +73,12 @@ public class VihfBuilder {
         }
 
         return tokenVIHF;
+    }
+
+    private Security fetchSamlSecurity() throws WrongWorkSituationKeyException {
+        Security security = securityFactory.createSecurity();
+        security.setAssertion(fetchAssertion());
+        return security;
     }
 
     private Assertion fetchAssertion() throws WrongWorkSituationKeyException {
