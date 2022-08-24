@@ -61,7 +61,9 @@ public class VihfBuilder {
             marshaller.setProperty(NAMESPACE_PREFIX_MAPPER_PACKAGE, new CustomNamespaceMapper());
 
             StringWriter sw = new StringWriter();
+            log.debug("starting assertion fetching for Ps {}...", userInfos.getSubjectNameID());
             marshaller.marshal(fetchSamlSecurity(), sw);
+            log.debug("assertion for Ps {} successfully fetched", userInfos.getSubjectNameID());
             tokenVIHF = sw.toString();
 
         } catch (PropertyException e) {
@@ -143,9 +145,12 @@ public class VihfBuilder {
     }
 
     private Attribute fetchRoles() throws WrongWorkSituationKeyException {
+        log.debug("getting ExercicePro");
         Practice exercicePro = getExercicePro(userInfos.getSubjectRefPro().getExercices(), workSituationId);
+        log.debug("retrieving NOS DMP referential");
         Map<String, Concept> nosMap = retrieveNosDMPSubjectRoleMap();
 
+        log.debug("setting attributes...");
         Attribute roleAttribute = assertionFactory.createAttribute();
         roleAttribute.setName(SUBJECT_ROLE);
         List<AttributeValue> attributeValues = new ArrayList<>();
@@ -201,7 +206,7 @@ public class VihfBuilder {
     }
 
     private Map<String, Concept> retrieveNosDMPSubjectRoleMap() throws NosReferentialRetrievingException {
-        Map<String, Concept> nosMap = new HashMap();
+        Map<String, Concept> nosMap = new HashMap<>();
         try {
             JAXBContext context = JAXBContext.newInstance(fr.ans.psc.model.nos.ObjectFactory.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();

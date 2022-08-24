@@ -52,12 +52,14 @@ public class GenerateVIHFPolicy {
         VihfBuilder vihfBuilder = new VihfBuilder(userInfos, workSituId, ins, configuration);
 
         try {
+            log.info("generating VIHF token...");
             String vihf = vihfBuilder.generateVIHF();
 
             // ajouter le jeton VIHF généré au contexte gravitee
             executionContext.setAttribute("vihf.token.payload", vihf);
-            // sortir de l'exécution de la policy
+            // enchaîner l'exécution de la policy
             policyChain.doNext(request, response);
+
         } catch (WrongWorkSituationKeyException e) {
             policyChain.failWith(PolicyResult.failure(HttpStatusCode.BAD_REQUEST_400, e.getMessage()));
         } catch (Exception e) {
