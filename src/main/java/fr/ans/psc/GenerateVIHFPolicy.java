@@ -45,7 +45,7 @@ public class GenerateVIHFPolicy {
 
         String payload = (String) executionContext.getAttribute("openid.userinfo.payload");
         String workSituId = request.headers().get("X-Worksituation");
-        String ins = request.headers().get("X-Ins");
+        String ins = request.headers().get("X-insHeader");
 
         UserInfos userInfos = objectMapper.readValue(payload, UserInfos.class);
 
