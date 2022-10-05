@@ -106,7 +106,8 @@ public class VihfBuilder {
 
     private Subject fetchSubject() {
         Subject subject = assertionFactory.createSubject();
-        subject.setNameID(userInfos.getSubjectNameID());
+        subject.setNameID("300000000077081");
+//        subject.setNameID(userInfos.getSubjectNameID());
 
         return subject;
     }
