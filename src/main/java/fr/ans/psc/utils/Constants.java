@@ -10,7 +10,7 @@ public class Constants {
 
     public static final String ISSUER_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName";
 
-    public static final String IDENTIFIANT_STRUCTURE = "Identifiant Structure";
+    public static final String IDENTIFIANT_STRUCTURE = "Identifiant_Structure";
 
     public static final String SECTEUR_ACTIVITE = "Secteur_Activite";
 
