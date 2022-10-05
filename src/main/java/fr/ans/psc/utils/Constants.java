@@ -12,7 +12,7 @@ public class Constants {
 
     public static final String IDENTIFIANT_STRUCTURE = "Identifiant Structure";
 
-    public static final String SECTEUR_ACTIVITE = "Secteur Activite";
+    public static final String SECTEUR_ACTIVITE = "Secteur_Activite";
 
     public static final String SUBJECT_ID = "urn:oasis:names:tc:xspa:1.0:subject:subject-id";
 
