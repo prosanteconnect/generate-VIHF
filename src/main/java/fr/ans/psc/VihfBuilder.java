@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.*;
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static fr.ans.psc.utils.Constants.*;
@@ -43,8 +43,10 @@ public class VihfBuilder {
         assertionFactory = new oasis.names.tc.saml._2_0.assertion.ObjectFactory();
         profilFactory = new org.hl7.v3.ObjectFactory();
 
-        LocalDateTime localDate = LocalDateTime.now(ZoneId.of("Europe/Paris"));
-        dateNow = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(localDate.minusMinutes(10));
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Paris"));
+        LocalDateTime delayed = now.minusMinutes(10);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        dateNow = delayed.format(formatter);
 
         this.userInfos = userInfos;
         this.workSituationId = workSituationId;
