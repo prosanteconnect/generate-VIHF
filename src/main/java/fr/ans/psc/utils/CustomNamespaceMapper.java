@@ -10,9 +10,9 @@ public class CustomNamespaceMapper extends NamespacePrefixMapper {
     private Map<String, String> namespaceMap = new HashMap<>();
 
     public CustomNamespaceMapper() {
-        namespaceMap.put("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "");
-        namespaceMap.put("urn:oasis:names:tc:SAML:2.0:assertion", "");
-        namespaceMap.put("urn:hl7-org:v3", "");
+        namespaceMap.put("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "wsse");
+        namespaceMap.put("urn:oasis:names:tc:SAML:2.0:assertion", "saml2");
+        namespaceMap.put("urn:hl7-org:v3", "hl7");
         namespaceMap.put("http://wwww.w3.org/2001/XMLSchema-instance", "xsi");
         namespaceMap.put("http://www.w3.org/2000/09/xmldsig#", "xmldsig");
     }
