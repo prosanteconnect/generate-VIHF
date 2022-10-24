@@ -1,54 +1,5 @@
 package fr.ans.psc;
 
-import static fr.ans.psc.utils.Constants.ASSERTION_VERSION;
-import static fr.ans.psc.utils.Constants.AUTHENTIFICATION_MODE;
-import static fr.ans.psc.utils.Constants.AUTHN_CONTEXT_CLASS_REF;
-import static fr.ans.psc.utils.Constants.AUTH_MODE_VALUE;
-import static fr.ans.psc.utils.Constants.CE_TYPE;
-import static fr.ans.psc.utils.Constants.DOCTOR_PROFESSION_CODE;
-import static fr.ans.psc.utils.Constants.HL7_NAMESPACE;
-import static fr.ans.psc.utils.Constants.IDENTIFIANT_STRUCTURE;
-import static fr.ans.psc.utils.Constants.ISSUER_FORMAT;
-import static fr.ans.psc.utils.Constants.LPS_ID_HOMOLOGATION_DMP;
-import static fr.ans.psc.utils.Constants.LPS_NOM;
-import static fr.ans.psc.utils.Constants.LPS_VERSION;
-import static fr.ans.psc.utils.Constants.NAMESPACE_PREFIX_MAPPER_PACKAGE;
-import static fr.ans.psc.utils.Constants.PHARMACIST_PROFESSION_CODE;
-import static fr.ans.psc.utils.Constants.PURPOSE_OF_USE;
-import static fr.ans.psc.utils.Constants.RESOURCE_ID;
-import static fr.ans.psc.utils.Constants.RESOURCE_URN;
-import static fr.ans.psc.utils.Constants.SECTEUR_ACTIVITE;
-import static fr.ans.psc.utils.Constants.SUBJECT_ID;
-import static fr.ans.psc.utils.Constants.SUBJECT_ROLE;
-import static fr.ans.psc.utils.Constants.URN_DMP;
-import static fr.ans.psc.utils.Constants.VIHF_VERSION;
-import static fr.ans.psc.utils.Constants.VIHF_VERSION_VALUE;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.Unmarshaller;
-
-import org.hl7.v3.PurposeOfUse;
-import org.hl7.v3.Role;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.Security;
-import org.slf4j.LoggerFactory;
-
 import fr.ans.psc.exception.JaxbMarshallingException;
 import fr.ans.psc.exception.NosReferentialRetrievingException;
 import fr.ans.psc.exception.WrongWorkSituationKeyException;
@@ -57,15 +8,18 @@ import fr.ans.psc.model.nos.RetrieveValueSetResponse;
 import fr.ans.psc.model.prosanteconnect.Practice;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import fr.ans.psc.utils.CustomNamespaceMapper;
-import oasis.names.tc.saml._2_0.assertion.Assertion;
-import oasis.names.tc.saml._2_0.assertion.Attribute;
-import oasis.names.tc.saml._2_0.assertion.AttributeStatement;
-import oasis.names.tc.saml._2_0.assertion.AttributeValue;
-import oasis.names.tc.saml._2_0.assertion.AuthnContext;
-import oasis.names.tc.saml._2_0.assertion.AuthnStatement;
-import oasis.names.tc.saml._2_0.assertion.Issuer;
-import oasis.names.tc.saml._2_0.assertion.ObjectFactory;
-import oasis.names.tc.saml._2_0.assertion.Subject;
+import oasis.names.tc.saml._2_0.assertion.*;
+import org.hl7.v3.PurposeOfUse;
+import org.hl7.v3.Role;
+import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.Security;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.*;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static fr.ans.psc.utils.Constants.*;
 
 public class VihfBuilder {
 
@@ -86,10 +40,14 @@ public class VihfBuilder {
         securityFactory = new org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ObjectFactory();
         assertionFactory = new oasis.names.tc.saml._2_0.assertion.ObjectFactory();
         profilFactory = new org.hl7.v3.ObjectFactory();
-        Date now = new Date();
-        // On retire 5 mn pour être sûr que la date soit dans le passé
-        long time = now.getTime() - 5 * 60 * 1000;
-        dateNow = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date(time));
+
+//        LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Paris"));
+//        LocalDateTime delayed = now.minusMinutes(10);
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+//        dateNow = delayed.format(formatter);
+
+        dateNow = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date());
+
         this.userInfos = userInfos;
         this.workSituationId = workSituationId;
         this.patientINS = patientINS;
