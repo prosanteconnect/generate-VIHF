@@ -33,7 +33,6 @@ public class VihfBuilderTest {
         assertNotNull(configuration);
         String generatedVihf = vihfBuilder.generateVIHF();
         assertNotEquals(null, generatedVihf);
-
 //        String expected = adaptAssertionTimestamps(generatedVihf, expectedVIHF());
 //        assertEquals(expected, generatedVihf);
     }

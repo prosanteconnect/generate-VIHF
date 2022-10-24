@@ -54,7 +54,8 @@ public class GenerateVIHFPolicy {
         try {
             log.info("generating VIHF token...");
             String vihf = vihfBuilder.generateVIHF();
-
+            //Suppression des namespaces suite à la réponse du DMP au ticket 94789
+            vihf.replaceAll("wsse:", "").replaceAll("saml2:", "").replaceAll("hl7:", "");
             // ajouter le jeton VIHF généré au contexte gravitee
             executionContext.setAttribute("vihf.token.payload", vihf);
             // enchaîner l'exécution de la policy
