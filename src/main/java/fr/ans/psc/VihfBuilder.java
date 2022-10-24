@@ -41,11 +41,6 @@ public class VihfBuilder {
         assertionFactory = new oasis.names.tc.saml._2_0.assertion.ObjectFactory();
         profilFactory = new org.hl7.v3.ObjectFactory();
 
-//        LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Paris"));
-//        LocalDateTime delayed = now.minusMinutes(10);
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-//        dateNow = delayed.format(formatter);
-
         dateNow = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date());
 
         this.userInfos = userInfos;
@@ -81,7 +76,7 @@ public class VihfBuilder {
             throw new JaxbMarshallingException("Could not marshall assertion", e);
         }
 
-        return tokenVIHF;
+        return tokenVIHF.replaceAll("wsse:", "").replaceAll("saml2:", "").replaceAll("hl7:", "");
     }
 
     private Security fetchSamlSecurity() throws WrongWorkSituationKeyException {
