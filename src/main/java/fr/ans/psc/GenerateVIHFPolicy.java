@@ -3,9 +3,27 @@
  */
 package fr.ans.psc;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.function.Function;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fr.ans.psc.exception.WrongWorkSituationKeyException;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import io.gravitee.common.http.HttpStatusCode;
@@ -18,26 +36,8 @@ import io.gravitee.gateway.api.http.stream.TransformableRequestStreamBuilder;
 import io.gravitee.gateway.api.stream.ReadWriteStream;
 import io.gravitee.policy.api.PolicyChain;
 import io.gravitee.policy.api.PolicyResult;
-import io.gravitee.policy.api.annotations.OnRequest;
 import io.gravitee.policy.api.annotations.OnRequestContent;
 import io.gravitee.policy.api.annotations.OnResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.function.Function;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 @SuppressWarnings("unused")
 public class GenerateVIHFPolicy {
@@ -95,8 +95,9 @@ public class GenerateVIHFPolicy {
             // ajouter le jeton VIHF généré au body
             Document body = DocumentBuilderFactory.newInstance().newDocumentBuilder().
             		parse(new InputSource(new StringReader(new String(input.getBytes()))));
-            Document assertion = DocumentBuilderFactory.newInstance().newDocumentBuilder().
-            		parse(new InputSource(new StringReader(vihf)));
+            Node assertion = DocumentBuilderFactory.newInstance().newDocumentBuilder().
+            		parse(new InputSource(new StringReader(vihf))).getDocumentElement();
+            assertion = body.importNode(assertion, true);
             NodeList headers = body.getElementsByTagName("soap:Header");
             Element header = (Element)headers.item(0);
             header.appendChild(assertion);
