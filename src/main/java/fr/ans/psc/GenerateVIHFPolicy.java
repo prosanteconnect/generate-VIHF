@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import java.io.IOException;
@@ -96,7 +97,8 @@ public class GenerateVIHFPolicy {
             		parse(new InputSource(new StringReader(new String(input.getBytes()))));
             Document assertion = DocumentBuilderFactory.newInstance().newDocumentBuilder().
             		parse(new InputSource(new StringReader(vihf)));
-            Element header = (Element)body.getElementsByTagName("soap:Header");
+            NodeList headers = body.getElementsByTagName("soap:Header");
+            Element header = (Element)headers.item(0);
             header.appendChild(assertion);
             DOMSource domSource = new DOMSource(body);
             
