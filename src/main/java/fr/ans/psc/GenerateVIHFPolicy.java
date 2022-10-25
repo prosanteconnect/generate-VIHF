@@ -67,11 +67,11 @@ public class GenerateVIHFPolicy {
                 .on(request)
                 .chain(policyChain)
                 .contentType(MediaType.APPLICATION_XML)
-                .transform(generate(executionContext, request, response, configuration, policyChain))
+                .transform(generate(executionContext, request, configuration, policyChain))
                 .build();
     }
     
-    private Function<Buffer,Buffer> generate(ExecutionContext executionContext,Request request, Response response, GenerateVIHFPolicyConfiguration configuration, PolicyChain policyChain){
+    private Function<Buffer,Buffer> generate(ExecutionContext executionContext, Request request, GenerateVIHFPolicyConfiguration configuration, PolicyChain policyChain){
     	return input -> {
         String payload = (String) executionContext.getAttribute("openid.userinfo.payload");
         String workSituId = request.headers().get("X-Worksituation");
@@ -107,8 +107,6 @@ public class GenerateVIHFPolicy {
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
             transformer.transform(domSource, result);
-            //TODO check if necessary
-            policyChain.doNext(request, response);
 
         } catch (WrongWorkSituationKeyException e) {
             policyChain.failWith(PolicyResult.failure(HttpStatusCode.BAD_REQUEST_400, e.getMessage()));
