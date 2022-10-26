@@ -76,7 +76,7 @@ public class VihfBuilder {
             throw new JaxbMarshallingException("Could not marshall assertion", e);
         }
 
-        return tokenVIHF;
+        return tokenVIHF.replaceAll("saml2:", "").replaceAll("hl7:", "");
     }
 
     private Security fetchSamlSecurity() throws WrongWorkSituationKeyException {
