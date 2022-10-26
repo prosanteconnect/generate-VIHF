@@ -2,6 +2,7 @@ package oasis.names.tc.saml._2_0.assertion;
 
 import org.hl7.v3.Role;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlMixed;
@@ -15,6 +16,9 @@ public class AttributeValue {
     })
     @XmlMixed
     protected List<Object> content;
+
+    @XmlAttribute(name = "type", namespace = "http://wwww.w3.org/2001/XMLSchema-instance", required = true)
+    protected String type;
 
     /**
      * Gets the value of the content property.
@@ -45,4 +49,17 @@ public class AttributeValue {
         }
         return this.content;
     }
+
+    /**
+     * Définit la valeur de la propriété type.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setType(String value) {
+        this.type = value;
+    }
+
 }

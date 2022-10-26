@@ -137,6 +137,7 @@ public class VihfBuilder {
 
     private Attribute fetchAttribute(Object attributeContent, String attributeName) {
         AttributeValue attributeValue = assertionFactory.createAttributeValue();
+        attributeValue.setType("xs:string");
         attributeValue.getContent().add(attributeContent);
         Attribute attribute = assertionFactory.createAttribute();
         attribute.setName(attributeName);
