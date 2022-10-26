@@ -3,27 +3,7 @@
  */
 package fr.ans.psc;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.function.Function;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import fr.ans.psc.exception.WrongWorkSituationKeyException;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import io.gravitee.common.http.HttpStatusCode;
@@ -38,6 +18,23 @@ import io.gravitee.policy.api.PolicyChain;
 import io.gravitee.policy.api.PolicyResult;
 import io.gravitee.policy.api.annotations.OnRequestContent;
 import io.gravitee.policy.api.annotations.OnResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class GenerateVIHFPolicy {
@@ -70,7 +67,7 @@ public class GenerateVIHFPolicy {
                 .transform(generate(executionContext, request, configuration, policyChain))
                 .build();
     }
-    
+
     private Function<Buffer,Buffer> generate(ExecutionContext executionContext, Request request, GenerateVIHFPolicyConfiguration configuration, PolicyChain policyChain){
     	return input -> {
         String payload = (String) executionContext.getAttribute("openid.userinfo.payload");
@@ -91,7 +88,7 @@ public class GenerateVIHFPolicy {
         try {
             log.info("generating VIHF token...");
             String vihf = vihfBuilder.generateVIHF();
-         
+
             // ajouter le jeton VIHF généré au body
             Document body = DocumentBuilderFactory.newInstance().newDocumentBuilder().
             		parse(new InputSource(new StringReader(new String(input.getBytes()))));
@@ -102,7 +99,7 @@ public class GenerateVIHFPolicy {
             Element header = (Element)headers.item(0);
             header.appendChild(assertion);
             DOMSource domSource = new DOMSource(body);
-            
+
             StreamResult result = new StreamResult(writer);
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
