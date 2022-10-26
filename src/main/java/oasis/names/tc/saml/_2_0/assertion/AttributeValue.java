@@ -19,6 +19,8 @@ public class AttributeValue {
 
     @XmlAttribute(name = "type", namespace = "http://wwww.w3.org/2001/XMLSchema-instance", required = true)
     protected String type;
+    @XmlAttribute(name = "xmlns:xs", required = false)
+    protected String nameSpace;
 
     /**
      * Gets the value of the content property.
@@ -60,6 +62,10 @@ public class AttributeValue {
      */
     public void setType(String value) {
         this.type = value;
+    }
+
+    public void setNameSpace(String nameSpace) {
+        this.nameSpace = nameSpace;
     }
 
 }
