@@ -8,11 +8,9 @@ import fr.ans.psc.model.nos.RetrieveValueSetResponse;
 import fr.ans.psc.model.prosanteconnect.Practice;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import fr.ans.psc.utils.CustomNamespaceMapper;
-import oasis.names.tc.saml._2_0.assertion.*;
-import org.hl7.v3.PurposeOfUse;
-import org.hl7.v3.Role;
-import org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.Security;
+import fr.ans.psc.vihf.*;
 import org.slf4j.LoggerFactory;
+
 
 import javax.xml.bind.*;
 import java.io.*;
@@ -25,9 +23,8 @@ public class VihfBuilder {
 
     private final org.slf4j.Logger log = LoggerFactory.getLogger(VihfBuilder.class);
 
-    private org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ObjectFactory securityFactory;
-    private oasis.names.tc.saml._2_0.assertion.ObjectFactory assertionFactory;
-    private org.hl7.v3.ObjectFactory profilFactory;
+    private ObjectFactory assertionFactory;
+
     private String dateNow;
 
     private UserInfos userInfos;
@@ -37,14 +34,8 @@ public class VihfBuilder {
 
     public VihfBuilder(UserInfos userInfos, String workSituationId, String patientINS,
                        GenerateVIHFPolicyConfiguration configuration) {
-        securityFactory = new org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ObjectFactory();
-        assertionFactory = new oasis.names.tc.saml._2_0.assertion.ObjectFactory();
-        profilFactory = new org.hl7.v3.ObjectFactory();
+        assertionFactory = new ObjectFactory();
 
-//        LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Paris"));
-//        LocalDateTime delayed = now.minusMinutes(10);
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-//        dateNow = delayed.format(formatter);
 
         dateNow = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date());
 
@@ -58,9 +49,7 @@ public class VihfBuilder {
         String tokenVIHF = "";
         try {
             JAXBContext context = JAXBContext.newInstance(
-                    org.oasis_open.docs.wss._2004._01.oasis_200401_wss_wssecurity_secext_1_0.ObjectFactory.class,
-                    ObjectFactory.class,
-                    org.hl7.v3.ObjectFactory.class);
+            		ObjectFactory.class);
 
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty("jaxb.formatted.output", Boolean.FALSE);
@@ -69,7 +58,7 @@ public class VihfBuilder {
 
             StringWriter sw = new StringWriter();
             log.debug("starting assertion fetching for Ps {}...", userInfos.getSubjectNameID());
-            marshaller.marshal(fetchSamlSecurity(), sw);
+            marshaller.marshal(fetchSoapEnvelope(), sw);
             log.debug("assertion for Ps {} successfully fetched", userInfos.getSubjectNameID());
             tokenVIHF = sw.toString();
 
@@ -84,8 +73,16 @@ public class VihfBuilder {
         return tokenVIHF;
     }
 
+    private Envelope fetchSoapEnvelope() throws WrongWorkSituationKeyException {
+    	Envelope envelope = assertionFactory.createEnvelope();
+    	Header header = assertionFactory.createHeader();
+    	envelope.setHeader(header);
+    	header.setSecurity(fetchSamlSecurity());
+    	return envelope;
+    }
+    
     private Security fetchSamlSecurity() throws WrongWorkSituationKeyException {
-        Security security = securityFactory.createSecurity();
+        Security security = assertionFactory.createSecurity();
         security.setAssertion(fetchAssertion());
         return security;
     }
@@ -130,7 +127,7 @@ public class VihfBuilder {
 
         attributeStatement.getAttribute().add(fetchAttribute(patientINS + "^^^&1.2.250.1.213.1.4.10&ISO^NH", RESOURCE_ID));
         attributeStatement.getAttribute().add(fetchAttribute(URN_DMP, RESOURCE_URN));
-        PurposeOfUse purposeOfUse = new PurposeOfUse(true);
+        PurposeOfUse purposeOfUse = new PurposeOfUse();
         attributeStatement.getAttribute().add(fetchAttribute(purposeOfUse, PURPOSE_OF_USE));
 
         attributeStatement.getAttribute().add(fetchAttribute(configuration.getLpsName(), LPS_NOM));
@@ -144,10 +141,8 @@ public class VihfBuilder {
         AttributeValue attributeValue = assertionFactory.createAttributeValue();
         attributeValue.getContent().add(attributeContent);
         Attribute attribute = assertionFactory.createAttribute();
+        attribute.getAttributeValue().add(attributeValue);
         attribute.setName(attributeName);
-        List<AttributeValue> attributeValues = new ArrayList<>();
-        attributeValues.add(attributeValue);
-        attribute.setAttributeValue(attributeValues);
         return attribute;
     }
 
@@ -160,16 +155,14 @@ public class VihfBuilder {
         log.debug("setting attributes...");
         Attribute roleAttribute = assertionFactory.createAttribute();
         roleAttribute.setName(SUBJECT_ROLE);
-        List<AttributeValue> attributeValues = new ArrayList<>();
+        List<AttributeValue> attributeValues = roleAttribute.getAttributeValue();
 
         attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getProfessionCode()));
 
         if (userInfos.getSubjectRefPro().getExercices().stream().anyMatch(practice ->
                 practice.getProfessionCode().equals(DOCTOR_PROFESSION_CODE) || practice.getProfessionCode().equals(PHARMACIST_PROFESSION_CODE))) {
-            attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getExpertiseCode()));
+        	attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getExpertiseCode()));
         }
-
-        roleAttribute.setAttributeValue(attributeValues);
         return roleAttribute;
     }
 
@@ -186,8 +179,7 @@ public class VihfBuilder {
     }
 
     private AttributeValue getRoleAttributeValue(Map<String, Concept> nosMap, String code) {
-        Role role = profilFactory.createRole();
-        role.setNameSpace(HL7_NAMESPACE);
+        Role role = assertionFactory.createRole();
         role.setCode(code);
         role.setCodeSystem(nosMap.get(code).getCodeSystem());
         role.setDisplayName(nosMap.get(code).getDisplayName());
