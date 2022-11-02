@@ -11,7 +11,6 @@ import fr.ans.psc.utils.CustomNamespaceMapper;
 import fr.ans.psc.vihf.*;
 import org.slf4j.LoggerFactory;
 
-
 import javax.xml.bind.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -49,7 +48,7 @@ public class VihfBuilder {
         String tokenVIHF = "";
         try {
             JAXBContext context = JAXBContext.newInstance(
-            		ObjectFactory.class);
+            		fr.ans.psc.vihf.ObjectFactory.class);
 
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty("jaxb.formatted.output", Boolean.FALSE);
