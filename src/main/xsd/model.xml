@@ -1,79 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
-	<soap:Header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	             xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-	<wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
-		xmlns:xsi="http://wwww.w3.org/2001/XMLSchema-instance">
-			<Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" ID="b2cf63db-3fdd-4f5b-8f00-fa110b0cade0"
-			                 IssueInstant="2022-10-11T15:08:44Z"
-			                 Version="2.0">
-				<Issuer Format="urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName">CN=api-proxy,OU=300000000077081,O=MINISTERE DE TEST7708,ST=C\C3\B4te-d'Or (21),C=FR</Issuer>
-				<Subject>
-					<NameID>899700366240</NameID>
-				</Subject>
-				<AuthnStatement AuthnInstant="2022-10-11T15:08:44Z">
-					<AuthnContext>
-						<AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered</AuthnContextClassRef>
-					</AuthnContext>
-				</AuthnStatement>
-				<AttributeStatement>
-					<Attribute Name="Identifiant_Structure">
-						<AttributeValue>300000000077081</AttributeValue>
-					</Attribute>
-					<Attribute Name="Secteur_Activite">
-						<AttributeValue>SA07^1.2.250.1.71.4.2.4</AttributeValue>
-					</Attribute>
-					<Attribute Name="urn:oasis:names:tc:xspa:1.0:subject:subject-id">
-						<AttributeValue>DOC0036624 KIT CABINET M DOC0036624</AttributeValue>
-					</Attribute>
-					<Attribute Name="urn:oasis:names:tc:xacml:2.0:subject:role">
-						<AttributeValue>
-							<Role xmlns="urn:hl7-org:v3"
-							          code="10"
-							          codeSystem="1.2.250.1.71.1.2.8"
-							          displayName="Médecin en formation"
-							          xsi:type="CE"/>
-						</AttributeValue>
-						<AttributeValue>
-							<Role xmlns="urn:hl7-org:v3"
-							          code="SM26"
-							          codeSystem="1.2.250.1.71.4.2.5"
-							          displayName="Qualifié en médecine générale (SM)"
-							          xsi:type="CE"/>
-						</AttributeValue>
-					</Attribute>
-					<Attribute Name="VIHF_Version">
-						<AttributeValue>3.0</AttributeValue>
-					</Attribute>
-					<Attribute Name="Authentification_mode">
-						<AttributeValue>INDIRECTE</AttributeValue>
-					</Attribute>
-					<Attribute Name="urn:oasis:names:tc:xacml:2.0:resource:resource-id">
-						<AttributeValue>207058575627097^^^&amp;1.2.250.1.213.1.4.10&amp;ISO^NH</AttributeValue>
-					</Attribute>
-					<Attribute Name="Ressource_URN">
-						<AttributeValue>urn:dmp</AttributeValue>
-					</Attribute>
-					<Attribute Name="urn:oasis:names:tc:xspa:1.0:subject:purposeofuse">
-						<AttributeValue>
-							<PurposeOfUse code="normal"
-							                  codeSystem="1.2.250.1.213.1.1.4.248"
-							                  codeSystemName="mode acces VIHF 2.0"
-							                  displayName="Accès normal"
-							                  xsi:type="CE"/>
-						</AttributeValue>
-					</Attribute>
-					<Attribute Name="LPS_Nom">
-						<AttributeValue>api-proxy</AttributeValue>
-					</Attribute>
-					<Attribute Name="LPS_Version">
-						<AttributeValue>1</AttributeValue>
-					</Attribute>
-					<Attribute Name="LPS_ID_HOMOLOGATION_DMP">
-						<AttributeValue>1</AttributeValue>
-					</Attribute>
-				</AttributeStatement>
-			</Assertion>
+	<soap:Header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:addr="http://www.w3.org/2005/08/addressing">
+		<addr:MessageID xmlns:addr="http://www.w3.org/2005/08/addressing">urn:uuid:798d8243-b4e3-4890-a9d5-30fa13926e95</addr:MessageID>
+		<addr:To />
+		<addr:ReplyTo mustUnderstand="true">
+			<addr:Address>http://www.w3.org/2005/08/addressing/anonymous</addr:Address>
+		</addr:ReplyTo>
+		<addr:Action mustUnderstand="true">urn:hl7-org:v3:PRPA_IN201314UV02</addr:Action>
+		<wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:xsi="http://wwww.w3.org/2001/XMLSchema-instance">
+			<saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:hl7="urn:hl7-org:v3" ID="b2cf63db-3fdd-4f5b-8f00-fa110b0cade0" IssueInstant="2022-10-11T15:08:44Z" Version="2.0">
+				<saml2:Issuer Format="urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName">CN=api-proxy,OU=300000000077081,O=MINISTERE DE TEST7708,ST=C\C3\B4te-d'Or (21),C=FR</saml2:Issuer>
+				<saml2:Subject>
+					<saml2:NameID>899700366240</saml2:NameID>
+				</saml2:Subject>
+				<saml2:AuthnStatement AuthnInstant="2022-10-11T15:08:44Z">
+					<saml2:AuthnContext>
+						<saml2:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered</saml2:AuthnContextClassRef>
+					</saml2:AuthnContext>
+				</saml2:AuthnStatement>
+				<saml2:AttributeStatement>
+					<saml2:Attribute Name="Identifiant_Structure">
+						<saml2:AttributeValue>300000000077081</saml2:AttributeValue>
+					</saml2:Attribute>
+					<saml2:Attribute Name="Secteur_Activite">
+						<saml2:AttributeValue>SA07^1.2.250.1.71.4.2.4</saml2:AttributeValue>
+					</saml2:Attribute>
+					<saml2:Attribute Name="urn:oasis:names:tc:xspa:1.0:subject:subject-id">
+						<saml2:AttributeValue>DOC0036624 KIT CABINET M DOC0036624</saml2:AttributeValue>
+					</saml2:Attribute>
+					<saml2:Attribute Name="urn:oasis:names:tc:xacml:2.0:subject:role">
+						<saml2:AttributeValue>
+							<hl7:Role xmlns="urn:hl7-org:v3" code="10" codeSystem="1.2.250.1.71.1.2.8" displayName="Médecin en formation" xsi:type="CE"/>
+						</saml2:AttributeValue>
+						<saml2:AttributeValue>
+							<hl7:Role xmlns="urn:hl7-org:v3" code="SM26" codeSystem="1.2.250.1.71.4.2.5" displayName="Qualifié en médecine générale (SM)" xsi:type="CE"/>
+						</saml2:AttributeValue>
+					</saml2:Attribute>
+					<saml2:Attribute Name="VIHF_Version">
+						<saml2:AttributeValue>3.0</saml2:AttributeValue>
+					</saml2:Attribute>
+					<saml2:Attribute Name="Authentification_mode">
+						<saml2:AttributeValue>INDIRECTE</saml2:AttributeValue>
+					</saml2:Attribute>
+					<saml2:Attribute Name="urn:oasis:names:tc:xacml:2.0:resource:resource-id">
+						<saml2:AttributeValue>207058575627097^^^&amp;1.2.250.1.213.1.4.10&amp;ISO^NH</saml2:AttributeValue>
+					</saml2:Attribute>
+					<saml2:Attribute Name="Ressource_URN">
+						<saml2:AttributeValue>urn:dmp</saml2:AttributeValue>
+					</saml2:Attribute>
+					<saml2:Attribute Name="urn:oasis:names:tc:xspa:1.0:subject:purposeofuse">
+						<saml2:AttributeValue>
+							<hl7:PurposeOfUse code="normal" codeSystem="1.2.250.1.213.1.1.4.248" codeSystemName="mode acces VIHF 2.0" displayName="Accès normal" xsi:type="CE"/>
+						</saml2:AttributeValue>
+					</saml2:Attribute>
+					<saml2:Attribute Name="LPS_Nom">
+						<saml2:AttributeValue>api-proxy</saml2:AttributeValue>
+					</saml2:Attribute>
+					<saml2:Attribute Name="LPS_Version">
+						<saml2:AttributeValue>1</saml2:AttributeValue>
+					</saml2:Attribute>
+					<saml2:Attribute Name="LPS_ID_HOMOLOGATION_DMP">
+						<saml2:AttributeValue>1</saml2:AttributeValue>
+					</saml2:Attribute>
+				</saml2:AttributeStatement>
+			</saml2:Assertion>
 		</wsse:Security>
 	</soap:Header>
 	<soap:Body>
