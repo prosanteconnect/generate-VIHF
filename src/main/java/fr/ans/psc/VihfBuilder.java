@@ -11,7 +11,6 @@ import fr.ans.psc.utils.CustomNamespaceMapper;
 import fr.ans.psc.vihf.*;
 import org.slf4j.LoggerFactory;
 
-
 import javax.xml.bind.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -45,11 +44,11 @@ public class VihfBuilder {
         this.configuration = configuration;
     }
 
-    public String generateVIHF() throws WrongWorkSituationKeyException {
+    public String generateVIHF() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
         String tokenVIHF = "";
         try {
             JAXBContext context = JAXBContext.newInstance(
-            		ObjectFactory.class);
+            		fr.ans.psc.vihf.ObjectFactory.class);
 
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty("jaxb.formatted.output", Boolean.FALSE);
@@ -73,7 +72,7 @@ public class VihfBuilder {
         return tokenVIHF;
     }
 
-    private Envelope fetchSoapEnvelope() throws WrongWorkSituationKeyException {
+    private Envelope fetchSoapEnvelope() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
     	Envelope envelope = assertionFactory.createEnvelope();
     	Header header = assertionFactory.createHeader();
     	envelope.setHeader(header);
@@ -81,13 +80,13 @@ public class VihfBuilder {
     	return envelope;
     }
     
-    private Security fetchSamlSecurity() throws WrongWorkSituationKeyException {
+    private Security fetchSamlSecurity() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
         Security security = assertionFactory.createSecurity();
         security.setAssertion(fetchAssertion());
         return security;
     }
 
-    private Assertion fetchAssertion() throws WrongWorkSituationKeyException {
+    private Assertion fetchAssertion() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
         Assertion assertion = assertionFactory.createAssertion();
         assertion.setIssuer(fetchIssuer());
         assertion.setIssueInstant(dateNow);
@@ -115,7 +114,7 @@ public class VihfBuilder {
         return subject;
     }
 
-    private AttributeStatement fetchAttributeStatement() throws WrongWorkSituationKeyException {
+    private AttributeStatement fetchAttributeStatement() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
         AttributeStatement attributeStatement = assertionFactory.createAttributeStatement();
         attributeStatement.getAttribute().add(fetchAttribute(configuration.getStructureId(), IDENTIFIANT_STRUCTURE));
         attributeStatement.getAttribute().add(fetchAttribute(userInfos.getActivitySector(), SECTEUR_ACTIVITE));
@@ -146,7 +145,7 @@ public class VihfBuilder {
         return attribute;
     }
 
-    private Attribute fetchRoles() throws WrongWorkSituationKeyException {
+    private Attribute fetchRoles() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
         log.debug("getting ExercicePro");
         Practice exercicePro = getExercicePro(userInfos.getSubjectRefPro().getExercices(), workSituationId);
         log.debug("retrieving NOS DMP referential");
@@ -178,8 +177,13 @@ public class VihfBuilder {
 
     }
 
-    private AttributeValue getRoleAttributeValue(Map<String, Concept> nosMap, String code) {
+    private AttributeValue getRoleAttributeValue(Map<String, Concept> nosMap, String code) throws NosReferentialRetrievingException {
         Role role = assertionFactory.createRole();
+        if (nosMap.get(code) == null) {
+            log.error("No record for NOS code {}", code);
+            log.error("Nos map size is {}", nosMap.size());
+            throw new NosReferentialRetrievingException("No record for NOS code " + code);
+        }
         role.setCode(code);
         role.setCodeSystem(nosMap.get(code).getCodeSystem());
         role.setDisplayName(nosMap.get(code).getDisplayName());

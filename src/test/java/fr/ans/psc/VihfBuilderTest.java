@@ -1,21 +1,20 @@
 package fr.ans.psc;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.ans.psc.exception.NosReferentialRetrievingException;
+import fr.ans.psc.exception.WrongWorkSituationKeyException;
+import fr.ans.psc.model.prosanteconnect.UserInfos;
+import org.junit.Test;
 
 import java.io.IOException;
 
-import org.junit.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import fr.ans.psc.exception.WrongWorkSituationKeyException;
-import fr.ans.psc.model.prosanteconnect.UserInfos;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class VihfBuilderTest {
 
     @Test
-    public void generateVIHFTest() throws IOException, WrongWorkSituationKeyException {
+    public void generateVIHFTest() throws IOException, WrongWorkSituationKeyException, NosReferentialRetrievingException {
         ObjectMapper objectMapper = new ObjectMapper();
         UserInfos userInfos = objectMapper.readValue(userInfosMock(), UserInfos.class);
         GenerateVIHFPolicyConfiguration configuration = new GenerateVIHFPolicyConfiguration();
@@ -34,7 +33,7 @@ public class VihfBuilderTest {
     }
 
     @Test(expected = WrongWorkSituationKeyException.class)
-    public void workSituationCheckFails() throws IOException, WrongWorkSituationKeyException {
+    public void workSituationCheckFails() throws IOException, WrongWorkSituationKeyException, NosReferentialRetrievingException {
         ObjectMapper objectMapper = new ObjectMapper();
         UserInfos userInfos = objectMapper.readValue(userInfosMock(), UserInfos.class);
         GenerateVIHFPolicyConfiguration configuration = new GenerateVIHFPolicyConfiguration();
