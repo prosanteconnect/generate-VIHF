@@ -18,6 +18,56 @@ public class GenerateVIHFPolicyConfiguration implements PolicyConfiguration {
 
     private String lpsHomologationNumber;
 
+    private String digitalSigningEndpoint;
+
+    private String signingConfigId;
+
+    private String clientSecret;
+
+    private boolean useSystemProxy;
+
+    private boolean useSSL;
+
+    public String getDigitalSigningEndpoint() {
+        return digitalSigningEndpoint;
+    }
+
+    public void setDigitalSigningEndpoint(String digitalSigningEndpoint) {
+        this.digitalSigningEndpoint = digitalSigningEndpoint;
+    }
+
+    public String getSigningConfigId() {
+        return signingConfigId;
+    }
+
+    public void setSigningConfigId(String signingConfigId) {
+        this.signingConfigId = signingConfigId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
+    public boolean isUseSystemProxy() {
+        return useSystemProxy;
+    }
+
+    public void setUseSystemProxy(boolean useSystemProxy) {
+        this.useSystemProxy = useSystemProxy;
+    }
+
+    public boolean isUseSSL() {
+        return useSSL;
+    }
+
+    public void setUseSSL(boolean useSSL) {
+        this.useSSL = useSSL;
+    }
+
     public String getCertificateDN() {
         return certificateDN;
     }

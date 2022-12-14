@@ -1,6 +1,6 @@
 package fr.ans.psc.exception;
 
-public class NosReferentialRetrievingException extends Exception {
+public class NosReferentialRetrievingException extends GenericVihfException {
 
     public NosReferentialRetrievingException(String message) {
         super(message);

@@ -1,5 +1,7 @@
 package fr.ans.psc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.ans.psc.exception.GenericVihfException;
 import fr.ans.psc.exception.JaxbMarshallingException;
 import fr.ans.psc.exception.NosReferentialRetrievingException;
 import fr.ans.psc.exception.WrongWorkSituationKeyException;
@@ -9,6 +11,8 @@ import fr.ans.psc.model.prosanteconnect.Practice;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import fr.ans.psc.utils.CustomNamespaceMapper;
 import fr.ans.psc.vihf.*;
+import io.gravitee.gateway.api.ExecutionContext;
+import io.gravitee.gateway.api.Request;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.*;
@@ -31,20 +35,22 @@ public class VihfBuilder {
     private String patientINS;
     private GenerateVIHFPolicyConfiguration configuration;
 
-    public VihfBuilder(UserInfos userInfos, String workSituationId, String patientINS,
-                       GenerateVIHFPolicyConfiguration configuration) {
-        assertionFactory = new ObjectFactory();
+    private final ObjectMapper objectMapper;
+    private static final String USER_INFOS_PAYLOAD_KEY = "openid.userinfo.payload";
 
-
-        dateNow = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date());
+    public VihfBuilder(UserInfos userInfos, String workSituationId, String insHeader,
+                       GenerateVIHFPolicyConfiguration configuration) throws GenericVihfException {
+        this.objectMapper = new ObjectMapper();
+        this.assertionFactory = new ObjectFactory();
+        this.dateNow = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(new Date());
 
         this.userInfos = userInfos;
         this.workSituationId = workSituationId;
-        this.patientINS = patientINS;
+        this.patientINS = insHeader;
         this.configuration = configuration;
     }
 
-    public String generateVIHF() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
+    public String generateVIHF() throws GenericVihfException {
         String tokenVIHF = "";
         try {
             JAXBContext context = JAXBContext.newInstance(
@@ -72,7 +78,7 @@ public class VihfBuilder {
         return tokenVIHF;
     }
 
-    private Envelope fetchSoapEnvelope() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
+    private Envelope fetchSoapEnvelope() throws GenericVihfException {
     	Envelope envelope = assertionFactory.createEnvelope();
     	Header header = assertionFactory.createHeader();
     	envelope.setHeader(header);
@@ -80,13 +86,13 @@ public class VihfBuilder {
     	return envelope;
     }
     
-    private Security fetchSamlSecurity() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
+    private Security fetchSamlSecurity() throws GenericVihfException {
         Security security = assertionFactory.createSecurity();
         security.setAssertion(fetchAssertion());
         return security;
     }
 
-    private Assertion fetchAssertion() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
+    private Assertion fetchAssertion() throws GenericVihfException {
         Assertion assertion = assertionFactory.createAssertion();
         assertion.setIssuer(fetchIssuer());
         assertion.setIssueInstant(dateNow);
@@ -114,7 +120,7 @@ public class VihfBuilder {
         return subject;
     }
 
-    private AttributeStatement fetchAttributeStatement() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
+    private AttributeStatement fetchAttributeStatement() throws GenericVihfException {
         AttributeStatement attributeStatement = assertionFactory.createAttributeStatement();
         attributeStatement.getAttribute().add(fetchAttribute(configuration.getStructureId(), IDENTIFIANT_STRUCTURE));
         attributeStatement.getAttribute().add(fetchAttribute(userInfos.getActivitySector(), SECTEUR_ACTIVITE));
@@ -145,24 +151,29 @@ public class VihfBuilder {
         return attribute;
     }
 
-    private Attribute fetchRoles() throws WrongWorkSituationKeyException, NosReferentialRetrievingException {
+    private Attribute fetchRoles() throws GenericVihfException {
         log.debug("getting ExercicePro");
-        Practice exercicePro = getExercicePro(userInfos.getSubjectRefPro().getExercices(), workSituationId);
-        log.debug("retrieving NOS DMP referential");
-        Map<String, Concept> nosMap = retrieveNosDMPSubjectRoleMap();
+        try {
+            Practice exercicePro = getExercicePro(userInfos.getSubjectRefPro().getExercices(), workSituationId);
+            log.debug("retrieving NOS DMP referential");
+            Map<String, Concept> nosMap = retrieveNosDMPSubjectRoleMap();
 
-        log.debug("setting attributes...");
-        Attribute roleAttribute = assertionFactory.createAttribute();
-        roleAttribute.setName(SUBJECT_ROLE);
-        List<AttributeValue> attributeValues = roleAttribute.getAttributeValue();
+            log.debug("setting attributes...");
+            Attribute roleAttribute = assertionFactory.createAttribute();
+            roleAttribute.setName(SUBJECT_ROLE);
+            List<AttributeValue> attributeValues = roleAttribute.getAttributeValue();
 
-        attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getProfessionCode()));
+            attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getProfessionCode()));
 
-        if (userInfos.getSubjectRefPro().getExercices().stream().anyMatch(practice ->
-                practice.getProfessionCode().equals(DOCTOR_PROFESSION_CODE) || practice.getProfessionCode().equals(PHARMACIST_PROFESSION_CODE))) {
-        	attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getExpertiseCode()));
+            if (userInfos.getSubjectRefPro().getExercices().stream().anyMatch(practice ->
+                    practice.getProfessionCode().equals(DOCTOR_PROFESSION_CODE) || practice.getProfessionCode().equals(PHARMACIST_PROFESSION_CODE))) {
+                attributeValues.add(getRoleAttributeValue(nosMap, exercicePro.getExpertiseCode()));
+            }
+            return roleAttribute;
+        } catch (WrongWorkSituationKeyException | NosReferentialRetrievingException e) {
+            throw new GenericVihfException(e.getMessage(), e.getCause());
         }
-        return roleAttribute;
+
     }
 
     private Practice getExercicePro(List<Practice> exercices, String workSituationKey) throws WrongWorkSituationKeyException {

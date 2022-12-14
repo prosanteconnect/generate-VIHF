@@ -1,6 +1,7 @@
 package fr.ans.psc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.ans.psc.exception.GenericVihfException;
 import fr.ans.psc.exception.NosReferentialRetrievingException;
 import fr.ans.psc.exception.WrongWorkSituationKeyException;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
 public class VihfBuilderTest {
 
     @Test
-    public void generateVIHFTest() throws IOException, WrongWorkSituationKeyException, NosReferentialRetrievingException {
+    public void generateVIHFTest() throws IOException, GenericVihfException {
         ObjectMapper objectMapper = new ObjectMapper();
         UserInfos userInfos = objectMapper.readValue(userInfosMock(), UserInfos.class);
         GenerateVIHFPolicyConfiguration configuration = new GenerateVIHFPolicyConfiguration();
@@ -32,8 +33,8 @@ public class VihfBuilderTest {
 
     }
 
-    @Test(expected = WrongWorkSituationKeyException.class)
-    public void workSituationCheckFails() throws IOException, WrongWorkSituationKeyException, NosReferentialRetrievingException {
+    @Test(expected = GenericVihfException.class)
+    public void workSituationCheckFails() throws IOException, GenericVihfException {
         ObjectMapper objectMapper = new ObjectMapper();
         UserInfos userInfos = objectMapper.readValue(userInfosMock(), UserInfos.class);
         GenerateVIHFPolicyConfiguration configuration = new GenerateVIHFPolicyConfiguration();

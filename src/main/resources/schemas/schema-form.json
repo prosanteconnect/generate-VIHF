@@ -25,6 +25,39 @@
       "title": "Numéro d'homologation du LPS",
       "description": "Numéro d'homologation de l'API Proxy auprès du DMP.",
       "type" : "string"
+    },
+    "digitalSigningEndpoint" : {
+      "title": "Signature endpoint",
+      "description": "Endpoint de signature (doit commencer par '/').",
+      "type" : "string",
+      "default": "/signatures/xmldsig"
+    },
+    "useSystemProxy" : {
+      "title": "System proxy",
+      "description": "Utiliser le system proxy",
+      "type" : "boolean",
+      "default": false
+    },
+    "useSSL" : {
+      "title": "Use SSL",
+      "description": "Utiliser TLS",
+      "type" : "boolean",
+      "default": false
+    },
+    "signingConfigId" : {
+      "title": "Signing Config Id",
+      "description": "Id de la configuration du serveur de signature utilisée",
+      "type" : "string",
+      "default": "1"
+    },
+    "clientSecret" : {
+      "title": "client Secret",
+      "description": "Secret requis pour l'accès au serveur de signature",
+      "type": "string",
+      "default": " ",
+      "x-schema-form": {
+        "type": "password"
+      }
     }
   }
 }
