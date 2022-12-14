@@ -192,8 +192,8 @@ public class GenerateVIHFPolicy {
         String payload = (String) context.getAttribute(USER_INFOS_PAYLOAD_KEY);
         try {
             return mapper.readValue(payload, UserInfos.class);
-        } catch (IOException e) {
-            log.error("Could not read User Infos");
+        } catch (Exception e) {
+            log.error("Could not read User Infos", e);
             throw new GenericVihfException("Could not read User Infos", e.getCause());
         }
     }

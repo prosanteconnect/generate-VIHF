@@ -63,7 +63,7 @@ public class VihfBuilder {
 
             StringWriter sw = new StringWriter();
             log.debug("starting assertion fetching for Ps {}...", userInfos.getSubjectNameID());
-            marshaller.marshal(fetchSoapEnvelope(), sw);
+            marshaller.marshal(fetchSamlSecurity(), sw);
             log.debug("assertion for Ps {} successfully fetched", userInfos.getSubjectNameID());
             tokenVIHF = sw.toString();
 
@@ -78,13 +78,13 @@ public class VihfBuilder {
         return tokenVIHF;
     }
 
-    private Envelope fetchSoapEnvelope() throws GenericVihfException {
-    	Envelope envelope = assertionFactory.createEnvelope();
-    	Header header = assertionFactory.createHeader();
-    	envelope.setHeader(header);
-    	header.setSecurity(fetchSamlSecurity());
-    	return envelope;
-    }
+//    private Envelope fetchSoapEnvelope() throws GenericVihfException {
+//    	Envelope envelope = assertionFactory.createEnvelope();
+//    	Header header = assertionFactory.createHeader();
+//    	envelope.setHeader(header);
+//    	header.setSecurity(fetchSamlSecurity());
+//    	return envelope;
+//    }
     
     private Security fetchSamlSecurity() throws GenericVihfException {
         Security security = assertionFactory.createSecurity();
