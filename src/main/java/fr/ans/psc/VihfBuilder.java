@@ -1,6 +1,7 @@
 package fr.ans.psc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import fr.ans.psc.exception.GenericVihfException;
 import fr.ans.psc.exception.JaxbMarshallingException;
 import fr.ans.psc.exception.NosReferentialRetrievingException;
@@ -85,7 +86,7 @@ public class VihfBuilder {
 //    	header.setSecurity(fetchSamlSecurity());
 //    	return envelope;
 //    }
-    
+
     private Security fetchSamlSecurity() throws GenericVihfException {
         Security security = assertionFactory.createSecurity();
         security.setAssertion(fetchAssertion());
@@ -132,8 +133,7 @@ public class VihfBuilder {
 
         attributeStatement.getAttribute().add(fetchAttribute(patientINS + "^^^&1.2.250.1.213.1.4.10&ISO^NH", RESOURCE_ID));
         attributeStatement.getAttribute().add(fetchAttribute(URN_DMP, RESOURCE_URN));
-        PurposeOfUse purposeOfUse = new PurposeOfUse();
-        attributeStatement.getAttribute().add(fetchAttribute(purposeOfUse, PURPOSE_OF_USE));
+        attributeStatement.getAttribute().add(fetchPurposeOfUse());
 
         attributeStatement.getAttribute().add(fetchAttribute(configuration.getLpsName(), LPS_NOM));
         attributeStatement.getAttribute().add(fetchAttribute(configuration.getLpsVersion(), LPS_VERSION));
@@ -151,6 +151,22 @@ public class VihfBuilder {
         return attribute;
     }
 
+    private Attribute fetchPurposeOfUse() {
+        PurposeOfUse purposeOfUse = assertionFactory.createPurposeOfUse();
+        purposeOfUse.setDisplayName("Accès normal");
+        purposeOfUse.setCodeSystemName("mode acces VIHF 2.0");
+        purposeOfUse.setCodeSystem("1.2.250.1.213.1.1.4.248");
+        purposeOfUse.setCode("normal");
+        purposeOfUse.setType(CE_TYPE);
+
+        AttributeValue purposeOfUseAttributeValue = assertionFactory.createAttributeValue();
+        purposeOfUseAttributeValue.getContent().add(purposeOfUse);
+
+        Attribute purposeOfUseAttribute = assertionFactory.createAttribute();
+        purposeOfUseAttribute.setName(PURPOSE_OF_USE);
+        purposeOfUseAttribute.getAttributeValue().add(purposeOfUseAttributeValue);
+        return purposeOfUseAttribute;
+    }
     private Attribute fetchRoles() throws GenericVihfException {
         log.debug("getting ExercicePro");
         try {
