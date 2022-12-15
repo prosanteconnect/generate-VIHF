@@ -4,6 +4,10 @@
 package fr.ans.psc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import fr.ans.esignsante.ApiClient;
+import fr.ans.esignsante.api.SignaturesApiControllerApi;
+import fr.ans.esignsante.model.ESignSanteSignatureReport;
 import fr.ans.psc.exception.GenericVihfException;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import io.gravitee.common.http.HttpStatusCode;
@@ -21,8 +25,12 @@ import io.gravitee.policy.api.PolicyResult;
 import io.gravitee.policy.api.annotations.OnRequestContent;
 import io.gravitee.policy.api.annotations.OnResponse;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.client.RestClientException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -36,9 +44,14 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.util.Base64;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static fr.ans.psc.utils.Constants.*;
@@ -52,9 +65,13 @@ public class GenerateVIHFPolicy {
      */
     private final GenerateVIHFPolicyConfiguration configuration;
 
-
+    private ApplicationContext applicationContext;
 
     private final ObjectMapper mapper;
+    private HttpClientOptions httpClientOptions;
+    private final Map<Thread, HttpClient> httpClients = new ConcurrentHashMap<>();
+    private Vertx vertx;
+    private String userAgent;
 
     /**
      * Create a new GenerateVIHF Policy instance based on its associated configuration
@@ -132,6 +149,11 @@ public class GenerateVIHFPolicy {
             onError.accept(PolicyResult.failure(GENERATE_VIHF_ERROR));
         }
         // -> sign body
+        try {
+            content = signRequestContent(content);
+        } catch (GenericVihfException e) {
+            onError.accept(PolicyResult.failure(GENERATE_VIHF_ERROR));
+        }
 
         // -> write buffer and end
         onSuccess.accept(content);
@@ -154,6 +176,35 @@ public class GenerateVIHFPolicy {
                 .setVariable(REQUEST_TEMPLATE_VARIABLE, new EvaluableRequest(context.request(), requestContent));
     }
 
+    private String signRequestContent(String requestContent) throws GenericVihfException {
+        try {
+            ApiClient client = new ApiClient();
+            client.setBasePath(configuration.getDigitalSigningEndpoint());
+            SignaturesApiControllerApi api = new SignaturesApiControllerApi(client);
+            File input = null;
+            try {
+                input = File.createTempFile("sign", "tmp");
+                Files.writeString(input.toPath(), requestContent);
+            } catch (IOException e) {
+                log.error("Error when preparing file to sign", e);
+                throw new GenericVihfException("Error when preparing file to sign", e);
+            }
+            ESignSanteSignatureReport report;
+            try {
+                report = api.signatureXMLdsig(configuration.getClientSecret(), Long.parseLong(configuration.getSigningConfigId()), input);
+            } catch (RestClientException e) {
+                log.error("Could not sign content on Signature server", e);
+                throw new GenericVihfException("Could not sign content on Signature server", e);
+            }
+
+            requestContent = new String(Base64.getDecoder().decode(report.getDocSigne()));
+
+            return requestContent;
+        } catch (Exception e) {
+            log.error("Could not sign VIHF", e);
+            throw new GenericVihfException("Could not sign VIHF", e);
+        }
+    }
     private String injectVihfToRequestContent(String requestContent, String vihf)
             throws GenericVihfException {
         try {

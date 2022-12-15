@@ -37,4 +37,6 @@ public class Constants {
     public static final String TRANSFER_ENCODING_HEADER = "Transfer-Encoding";
     public static final String CHUNKED = "chunked";
     public static final String USER_INFOS_PAYLOAD_KEY = "openid.userinfo.payload";
+    public static final int HTTP_PORT = 80;
+    public static final int HTTPS_PORT = 443;
 }
