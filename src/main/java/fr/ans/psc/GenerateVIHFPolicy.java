@@ -89,8 +89,9 @@ public class GenerateVIHFPolicy {
                             if (result.length() > 0) {
                                 // REWRITE BUFFER WITH TRANSFORMED RESULT
                                 super.write(Buffer.buffer(result));
+                                super.end();
                             }
-                            super.end();
+
                         },
                         policyChain::streamFailWith);
             }
