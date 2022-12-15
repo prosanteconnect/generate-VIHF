@@ -93,10 +93,10 @@ public class GenerateVIHFPolicy {
                             if (result.length() > 0) {
                                 // REWRITE BUFFER WITH TRANSFORMED RESULT
                                 log.error("transformed body length : {}", result.length());
+                                HttpHeaders headers = executionContext.request().headers();
+                                headers.set("Content-Length", String.valueOf(result.length()));
                                 super.write(Buffer.buffer(result));
                             }
-                            HttpHeaders headers = executionContext.request().headers();
-                            headers.set("Content-Length", String.valueOf(result.length()));
                             super.end();
                         },
                         policyChain::streamFailWith);
