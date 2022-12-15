@@ -89,6 +89,11 @@ public class GenerateVIHFPolicy {
                             if (result.length() > 0) {
                                 // REWRITE BUFFER WITH TRANSFORMED RESULT
                                 super.write(result);
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
                                 super.end();
                             }
 
