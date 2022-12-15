@@ -12,8 +12,6 @@ import fr.ans.psc.model.prosanteconnect.Practice;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import fr.ans.psc.utils.CustomNamespaceMapper;
 import fr.ans.psc.vihf.*;
-import io.gravitee.gateway.api.ExecutionContext;
-import io.gravitee.gateway.api.Request;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.*;
