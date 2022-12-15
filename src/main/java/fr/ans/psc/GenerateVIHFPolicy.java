@@ -7,11 +7,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ans.psc.exception.GenericVihfException;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
 import io.gravitee.common.http.HttpStatusCode;
+import io.gravitee.common.http.MediaType;
 import io.gravitee.gateway.api.ExecutionContext;
 import io.gravitee.gateway.api.Request;
 import io.gravitee.gateway.api.Response;
 import io.gravitee.gateway.api.buffer.Buffer;
 import io.gravitee.gateway.api.el.EvaluableRequest;
+import io.gravitee.gateway.api.http.HttpHeaders;
+import io.gravitee.gateway.api.http.stream.TransformableRequestStreamBuilder;
 import io.gravitee.gateway.api.stream.BufferedReadWriteStream;
 import io.gravitee.gateway.api.stream.ReadWriteStream;
 import io.gravitee.gateway.api.stream.SimpleReadWriteStream;
@@ -39,6 +42,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class GenerateVIHFPolicy {
@@ -88,12 +92,53 @@ public class GenerateVIHFPolicy {
                         result -> {
                             if (result.length() > 0) {
                                 // REWRITE BUFFER WITH TRANSFORMED RESULT
+                                log.error("transformed body length : {}", result.length());
                                 super.write(Buffer.buffer(result));
                             }
+                            HttpHeaders headers = executionContext.request().headers();
+                            headers.set("Content-Length", String.valueOf(result.length()));
                             super.end();
                         },
                         policyChain::streamFailWith);
             }
+        };
+    }
+
+//    @SuppressWarnings({ "rawtypes", "unchecked" })
+//    @OnRequestContent
+//    public ReadWriteStream onRequestContent(Request request, Response response,
+//                                            ExecutionContext executionContext, PolicyChain policyChain) {
+//        return TransformableRequestStreamBuilder
+//                .on(request)
+//                .chain(policyChain)
+//                .contentType(MediaType.APPLICATION_XML)
+//                .transform(generateVihfAndSignIt(executionContext, policyChain))
+//                .build();
+//    }
+
+    private Function<Buffer, Buffer> generateVihfAndSignIt(ExecutionContext context, PolicyChain policyChain) {
+        return input -> {
+            log.error("start VIHF generation");
+            String vihfToken = null;
+            EvaluableRequest request = (EvaluableRequest) context.getTemplateEngine().getTemplateContext()
+                    .lookupVariable(REQUEST_TEMPLATE_VARIABLE);
+
+            try {
+                UserInfos userInfos = getUserInfos(context);
+                String workSituationId = request.getHeaders().get("X-Worksituation");
+                String insHeader = request.getHeaders().get("X-insHeader");
+
+                VihfBuilder vihfBuilder = new VihfBuilder(userInfos, workSituationId, insHeader, configuration);
+                vihfToken = vihfBuilder.generateVIHF();
+
+            } catch (GenericVihfException e) {
+                policyChain.streamFailWith(PolicyResult.failure(GENERATE_VIHF_ERROR));
+            }
+            log.error("VIHF generation ok : {}", vihfToken);
+
+
+
+            return input;
         };
     }
 
@@ -122,6 +167,7 @@ public class GenerateVIHFPolicy {
 
         // -> insert VIHF in body
         String content = request.getContent();
+        log.error("initial request length : {}", content.length());
         try {
             content = injectVihfToRequestContent(request.getContent(), vihfToken);
 
