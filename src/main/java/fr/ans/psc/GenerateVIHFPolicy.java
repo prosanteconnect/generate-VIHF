@@ -88,17 +88,19 @@ public class GenerateVIHFPolicy {
                         result -> {
                             if (result.length() > 0) {
                                 // REWRITE BUFFER WITH TRANSFORMED RESULT
-                                super.write(Buffer.buffer(result));
+                                super.write(result);
                                 super.end();
                             }
 
                         },
-                        policyChain::streamFailWith);
+                        policyChain::streamFailWith,
+                        buffer);
             }
         };
     }
 
-    private void generateVihfAndSign(ExecutionContext executionContext, Consumer<String> onSuccess, Consumer<PolicyResult> onError) {
+    private void generateVihfAndSign(ExecutionContext executionContext, Consumer<Buffer> onSuccess,
+                                     Consumer<PolicyResult> onError, Buffer buffer) {
         final Consumer<Void> onSuccessCallback;
         final Consumer<PolicyResult> onErrorCallback;
 
@@ -131,7 +133,8 @@ public class GenerateVIHFPolicy {
         // -> sign body
 
         // -> write buffer and end
-        onSuccess.accept(content);
+        buffer.appendBuffer(Buffer.buffer(content));
+        onSuccess.accept(buffer);
     }
 
     @OnResponse
