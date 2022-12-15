@@ -76,7 +76,8 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
-            <scope>provided</scope>
+            <version>4.2.7</version>
+<!--            <scope>provided</scope>-->
         </dependency>
 
         <!-- logging -->
