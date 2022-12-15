@@ -94,7 +94,8 @@ public class GenerateVIHFPolicy {
                                 // REWRITE BUFFER WITH TRANSFORMED RESULT
                                 log.error("transformed body length : {}", result.length());
                                 HttpHeaders headers = executionContext.request().headers();
-                                headers.set("Content-Length", String.valueOf(result.length() + 7));
+//                                headers.set("Content-Length", String.valueOf(result.length() + 7));
+                                headers.remove("Content-Length");
                                 super.write(Buffer.buffer(result));
                             }
                             super.end();
