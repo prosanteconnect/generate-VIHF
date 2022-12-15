@@ -19,6 +19,7 @@ import io.gravitee.policy.api.PolicyChain;
 import io.gravitee.policy.api.PolicyResult;
 import io.gravitee.policy.api.annotations.OnRequestContent;
 import io.gravitee.policy.api.annotations.OnResponse;
+import io.vertx.core.Vertx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -87,17 +88,16 @@ public class GenerateVIHFPolicy {
                         result -> {
                             if (result.length() > 0) {
                                 // REWRITE BUFFER WITH TRANSFORMED RESULT
-                                super.write(result);
-                                super.end();
+                                super.write(Buffer.buffer(result));
                             }
-
+                            super.end();
                         },
                         policyChain::streamFailWith);
             }
         };
     }
 
-    private void generateVihfAndSign(ExecutionContext executionContext, Consumer<Buffer> onSuccess,
+    private void generateVihfAndSign(ExecutionContext executionContext, Consumer<String> onSuccess,
                                      Consumer<PolicyResult> onError) {
         final Consumer<Void> onSuccessCallback;
         final Consumer<PolicyResult> onErrorCallback;
@@ -131,8 +131,7 @@ public class GenerateVIHFPolicy {
         // -> sign body
 
         // -> write buffer and end
-        Buffer buffer = Buffer.buffer(content);
-        onSuccess.accept(buffer);
+        onSuccess.accept(content);
     }
 
     @OnResponse
@@ -168,7 +167,7 @@ public class GenerateVIHFPolicy {
 
             return getXMLStringFromDocument(body);
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            log.error("XML parsing error");
+            log.error("XML parsing error", e);
             throw new GenericVihfException("XML parsing error", e.getCause());
         }
 
@@ -184,7 +183,7 @@ public class GenerateVIHFPolicy {
             transformer.transform(domSource, result);
             return writer.toString();
         } catch (TransformerException e) {
-            log.error("Could not convert XML tree to String");
+            log.error("Could not convert XML tree to String", e);
             throw new GenericVihfException(e.getMessage(), e.getCause());
         }
 
