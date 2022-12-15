@@ -19,6 +19,7 @@ import io.gravitee.policy.api.PolicyChain;
 import io.gravitee.policy.api.PolicyResult;
 import io.gravitee.policy.api.annotations.OnRequestContent;
 import io.gravitee.policy.api.annotations.OnResponse;
+import io.vertx.core.Vertx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -89,6 +90,10 @@ public class GenerateVIHFPolicy {
                             if (result.length() > 0) {
                                 // REWRITE BUFFER WITH TRANSFORMED RESULT
                                 super.write(result);
+                                executionContext.getComponent(Vertx.class)
+                                        .setTimer(
+                                                500,
+                                                timerId -> policyChain.doNext(request, response));
                                 super.end();
                             }
 
