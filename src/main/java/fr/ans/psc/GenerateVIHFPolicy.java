@@ -191,7 +191,8 @@ public class GenerateVIHFPolicy {
             }
             ESignSanteSignatureReport report;
             try {
-                report = api.signatureXMLdsig(configuration.getClientSecret(), Long.parseLong(configuration.getSigningConfigId()), input);
+                report = api.signatureXMLdsig(configuration.getClientSecret(),
+                        Long.parseLong(configuration.getSigningConfigId()), input);
             } catch (RestClientException e) {
                 log.error("Could not sign content on Signature server", e);
                 throw new GenericVihfException("Could not sign content on Signature server", e);
