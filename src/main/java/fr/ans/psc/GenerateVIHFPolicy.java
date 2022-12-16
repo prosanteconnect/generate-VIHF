@@ -115,6 +115,7 @@ public class GenerateVIHFPolicy {
                                 HttpHeaders headers = executionContext.request().headers();
                                 headers.remove(CONTENT_LENGTH_HEADER);
                                 headers.set(TRANSFER_ENCODING_HEADER, CHUNKED);
+                                log.error(result);
                                 super.write(Buffer.buffer(result));
                             }
                             super.end();
