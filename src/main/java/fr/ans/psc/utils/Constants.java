@@ -31,6 +31,7 @@ public class Constants {
     public static final String NAMESPACE_PREFIX_MAPPER_PACKAGE = "com.sun.xml.bind.namespacePrefixMapper";
     public static final String REQUEST_TEMPLATE_VARIABLE = "request";
     public static final String GENERATE_VIHF_ERROR = "GENERATE_VIHF_ERROR";
+    public static final String VIHF_SIGNING_ERROR = "VIHF_SIGNING_ERROR";
     public static final String WORK_SITUATION_HEADER = "X-WorkSituation";
     public static final String PATIENT_INS_HEADER = "X-PatientINS";
     public static final String CONTENT_LENGTH_HEADER = "Content-Length";
@@ -39,4 +40,15 @@ public class Constants {
     public static final String USER_INFOS_PAYLOAD_KEY = "openid.userinfo.payload";
     public static final int HTTP_PORT = 80;
     public static final int HTTPS_PORT = 443;
+
+    public static final String ID_SIGN_CONF_KEY = "idSignConf";
+
+    public static final String SIGN_SECRET_KEY = "secret";
+    public static final String CONTENT_TYPE_HEADER = "content-type";
+
+    public static final String MULTIPART_FORM_HEADER = "multipart/form-data";
+
+    public static final String ACCEPT_HEADER = "Accept";
+
+    public static final String JSON_HEADER = "application/json";
 }
