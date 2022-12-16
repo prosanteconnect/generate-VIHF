@@ -129,7 +129,7 @@ public class VihfBuilder {
         attributeStatement.getAttribute().add(fetchAttribute(VIHF_VERSION_VALUE, VIHF_VERSION));
         attributeStatement.getAttribute().add(fetchAttribute(AUTH_MODE_VALUE, AUTHENTIFICATION_MODE));
 
-        attributeStatement.getAttribute().add(fetchAttribute(patientINS + "^^^&1.2.250.1.213.1.4.10&ISO^NH", RESOURCE_ID));
+        attributeStatement.getAttribute().add(fetchAttribute(patientINS, RESOURCE_ID));
         attributeStatement.getAttribute().add(fetchAttribute(URN_DMP, RESOURCE_URN));
         attributeStatement.getAttribute().add(fetchPurposeOfUse());
 
