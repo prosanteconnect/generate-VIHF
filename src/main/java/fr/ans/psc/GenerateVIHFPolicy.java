@@ -94,7 +94,7 @@ public class GenerateVIHFPolicy{
         vertx = executionContext.getComponent(Vertx.class);
         String url = configuration.getDigitalSigningEndpoint();
         URI target = URI.create(url);
-        HttpClientOptions httpClientOptions = new HttpClientOptions();
+        httpClientOptions = new HttpClientOptions();
 
         httpClientOptions
                 .setDefaultHost(target.getHost())
