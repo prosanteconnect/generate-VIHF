@@ -1,7 +1,6 @@
 package fr.ans.psc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import fr.ans.psc.exception.GenericVihfException;
 import fr.ans.psc.exception.JaxbMarshallingException;
 import fr.ans.psc.exception.NosReferentialRetrievingException;
@@ -97,8 +96,7 @@ public class VihfBuilder {
         assertion.setIssueInstant(dateNow);
         assertion.setSubject(fetchSubject());
         assertion.setVersion(ASSERTION_VERSION);
-        assertion.setID("test_id");
-//        assertion.setID(UUID.randomUUID().toString());
+        assertion.setID(UUID.randomUUID().toString());
         assertion.setAuthnStatement(fetchAuthnStatement());
         assertion.setAttributeStatement(fetchAttributeStatement());
 
