@@ -27,10 +27,10 @@
       "type" : "string"
     },
     "digitalSigningEndpoint" : {
-      "title": "Signature endpoint",
-      "description": "Endpoint de signature (doit commencer par '/').",
+      "title": "Endpoint de signature",
+      "description": "Endpoint du serveur de signature en XMLdsig",
       "type" : "string",
-      "default": "/signatures/xmldsig"
+      "default": "http://localhost/signatures/xmldsig"
     },
     "useSystemProxy" : {
       "title": "System proxy",
