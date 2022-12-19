@@ -69,9 +69,7 @@ import static fr.ans.psc.utils.Constants.*;
 import static io.gravitee.common.util.VertxProxyOptionsUtils.setSystemProxy;
 
 @SuppressWarnings("unused")
-public class GenerateVIHFPolicy implements ApplicationContextAware {
-
-    private ApplicationContext applicationContext;
+public class GenerateVIHFPolicy{
     private final Logger log = LoggerFactory.getLogger(GenerateVIHFPolicy.class);
     /**
      * The associated configuration to this GenerateVIHF Policy
@@ -92,8 +90,8 @@ public class GenerateVIHFPolicy implements ApplicationContextAware {
         this.mapper = new ObjectMapper();
     }
 
-    private void initVertxClient() {
-        vertx = applicationContext.getBean(Vertx.class);
+    private void initVertxClient(ExecutionContext executionContext) {
+        vertx = executionContext.getComponent(Vertx.class);
         String url = configuration.getDigitalSigningEndpoint();
         URI target = URI.create(url);
         HttpClientOptions httpClientOptions = new HttpClientOptions();
@@ -108,7 +106,7 @@ public class GenerateVIHFPolicy implements ApplicationContextAware {
             httpClientOptions.setSsl(true).setTrustAll(true).setVerifyHost(false);
         }
         if (configuration.isUseSystemProxy()) {
-            Configuration config = new SpringEnvironmentConfiguration(applicationContext.getEnvironment());
+            Configuration config = executionContext.getComponent(Configuration.class);
             try {
                 setSystemProxy(httpClientOptions, config);
             } catch (IllegalStateException e) {
@@ -134,7 +132,7 @@ public class GenerateVIHFPolicy implements ApplicationContextAware {
             @Override
             public void end() {
                 initRequestResponseProperties(executionContext, buffer.toString());
-                initVertxClient();
+                initVertxClient(executionContext);
                 generateVihfAndSign(
                         executionContext,
                         result -> {
@@ -294,10 +292,5 @@ public class GenerateVIHFPolicy implements ApplicationContextAware {
             default:
                 return false;
         }
-    }
-
-    @Override
-    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 }
