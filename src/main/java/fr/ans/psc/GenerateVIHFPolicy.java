@@ -158,7 +158,7 @@ public class GenerateVIHFPolicy implements ApplicationContextAware {
     private void generateVihfAndSign(ExecutionContext executionContext, Consumer<String> onSuccess,
                                      Consumer<PolicyResult> onError) {
 
-        // BUSINESS METHOD
+        // generate VIHF token
         String vihfToken = null;
         EvaluableRequest request = (EvaluableRequest) executionContext.getTemplateEngine().getTemplateContext()
                 .lookupVariable(REQUEST_TEMPLATE_VARIABLE);
@@ -175,7 +175,6 @@ public class GenerateVIHFPolicy implements ApplicationContextAware {
             onError.accept(PolicyResult.failure(GENERATE_VIHF_ERROR));
         }
 
-
         // -> insert VIHF in body
         String content = request.getContent();
         try {
@@ -184,16 +183,13 @@ public class GenerateVIHFPolicy implements ApplicationContextAware {
         } catch (GenericVihfException e) {
             onError.accept(PolicyResult.failure(GENERATE_VIHF_ERROR));
         }
+
         // -> sign body
-
-
         Future<HttpResponse<io.vertx.core.buffer.Buffer>> futureResponse = signRequestContent(content);
-
         futureResponse.onFailure(failure -> {
             log.error("Could not send document do signature server", failure);
             onError.accept(PolicyResult.failure(VIHF_SIGNING_ERROR));
         });
-
         futureResponse.onSuccess(response -> {
             if (response.statusCode() == HttpStatusCode.OK_200) {
                 log.error("VIHF successfully signed");
