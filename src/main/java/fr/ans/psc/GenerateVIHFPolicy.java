@@ -92,7 +92,6 @@ public class GenerateVIHFPolicy implements ApplicationContextAware {
         this.mapper = new ObjectMapper();
     }
 
-    @PostConstruct
     private void initVertxClient() {
         vertx = applicationContext.getBean(Vertx.class);
         String url = configuration.getDigitalSigningEndpoint();
@@ -135,7 +134,7 @@ public class GenerateVIHFPolicy implements ApplicationContextAware {
             @Override
             public void end() {
                 initRequestResponseProperties(executionContext, buffer.toString());
-
+                initVertxClient();
                 generateVihfAndSign(
                         executionContext,
                         result -> {
