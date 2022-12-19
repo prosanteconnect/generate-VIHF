@@ -22,10 +22,12 @@ import io.gravitee.gateway.api.stream.BufferedReadWriteStream;
 import io.gravitee.gateway.api.stream.ReadWriteStream;
 import io.gravitee.gateway.api.stream.SimpleReadWriteStream;
 import io.gravitee.node.api.configuration.Configuration;
+import io.gravitee.node.container.spring.SpringEnvironmentConfiguration;
 import io.gravitee.policy.api.PolicyChain;
 import io.gravitee.policy.api.PolicyResult;
 import io.gravitee.policy.api.annotations.OnRequestContent;
 import io.gravitee.policy.api.annotations.OnResponse;
+import io.reactivex.annotations.NonNull;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.*;
@@ -34,6 +36,9 @@ import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.multipart.MultipartForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.client.RestClientException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -63,22 +68,18 @@ import static fr.ans.psc.utils.Constants.*;
 import static io.gravitee.common.util.VertxProxyOptionsUtils.setSystemProxy;
 
 @SuppressWarnings("unused")
-public class GenerateVIHFPolicy {
+public class GenerateVIHFPolicy implements ApplicationContextAware {
 
-
+    private ApplicationContext applicationContext;
     private final Logger log = LoggerFactory.getLogger(GenerateVIHFPolicy.class);
     /**
      * The associated configuration to this GenerateVIHF Policy
      */
     private final GenerateVIHFPolicyConfiguration configuration;
 
-//    private ApplicationContext applicationContext;
-
     private final ObjectMapper mapper;
-//    private HttpClientOptions httpClientOptions;
-//    private final Map<Thread, HttpClient> httpClients = new ConcurrentHashMap<>();
-//    private Vertx vertx;
-//    private String userAgent;
+    private Vertx vertx;
+    private HttpClientOptions httpClientOptions;
 
     /**
      * Create a new GenerateVIHF Policy instance based on its associated configuration
@@ -88,6 +89,33 @@ public class GenerateVIHFPolicy {
     public GenerateVIHFPolicy(GenerateVIHFPolicyConfiguration configuration) {
         this.configuration = configuration;
         this.mapper = new ObjectMapper();
+        initVertxClient();
+    }
+
+    private void initVertxClient() {
+        vertx = applicationContext.getBean(Vertx.class);
+        String url = configuration.getDigitalSigningEndpoint();
+        URI target = URI.create(url);
+        HttpClientOptions httpClientOptions = new HttpClientOptions();
+
+        httpClientOptions
+                .setDefaultHost(target.getHost())
+                .setDefaultPort(configuration.isUseSSL() ? HTTPS_PORT : HTTP_PORT)
+                .setIdleTimeout(60)
+                .setConnectTimeout(1000);
+
+        if (configuration.isUseSSL()) {
+            httpClientOptions.setSsl(true).setTrustAll(true).setVerifyHost(false);
+        }
+        if (configuration.isUseSystemProxy()) {
+            Configuration config = new SpringEnvironmentConfiguration(applicationContext.getEnvironment());
+            try {
+                setSystemProxy(httpClientOptions, config);
+            } catch (IllegalStateException e) {
+                log.warn("Digital Signing requires a system proxy to be defined but some configurations are " +
+                        "missing or not well defined: {}. Ignoring proxy.", e.getMessage(), e.getCause());
+            }
+        }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -116,7 +144,9 @@ public class GenerateVIHFPolicy {
                                 headers.remove(CONTENT_LENGTH_HEADER);
                                 headers.set(TRANSFER_ENCODING_HEADER, CHUNKED);
                                 log.error(result);
-                                super.write(Buffer.buffer(result));
+                                Buffer buf = Buffer.buffer();
+                                buf.appendString(result);
+                                super.write(buf);
                             }
                             super.end();
                         },
@@ -156,42 +186,8 @@ public class GenerateVIHFPolicy {
         }
         // -> sign body
 
-//            content = signRequestContent(content);
-        Vertx vertx = executionContext.getComponent(Vertx.class);
-        String url = configuration.getDigitalSigningEndpoint();
-        URI target = URI.create(url);
-        HttpClientOptions httpClientOptions = new HttpClientOptions();
 
-        httpClientOptions
-                .setDefaultHost(target.getHost())
-                .setDefaultPort(configuration.isUseSSL() ? HTTPS_PORT : HTTP_PORT)
-                .setIdleTimeout(60)
-                .setConnectTimeout(1000);
-
-        if (configuration.isUseSSL()) {
-            httpClientOptions.setSsl(true).setTrustAll(true).setVerifyHost(false);
-        }
-        if (configuration.isUseSystemProxy()) {
-            Configuration config = executionContext.getComponent(Configuration.class);
-            try {
-                setSystemProxy(httpClientOptions, config);
-            } catch (IllegalStateException e) {
-                log.warn("Digital Signing requires a system proxy to be defined but some configurations are " +
-                        "missing or not well defined: {}. Ignoring proxy.", e.getMessage(), e.getCause());
-            }
-        }
-
-        HttpClient httpClient = vertx.createHttpClient(httpClientOptions);
-        WebClient webClient = WebClient.wrap(httpClient);
-        io.vertx.core.buffer.Buffer buffer = io.vertx.core.buffer.Buffer.buffer(content);
-        MultipartForm form = MultipartForm.create().attribute(ID_SIGN_CONF_KEY, configuration.getSigningConfigId())
-                .attribute(SIGN_SECRET_KEY, configuration.getClientSecret())
-                .binaryFileUpload("file", "file", buffer, MediaType.MEDIA_APPLICATION_OCTET_STREAM.toMediaString());
-
-        Future<HttpResponse<io.vertx.core.buffer.Buffer>> futureResponse = webClient.post(configuration.getDigitalSigningEndpoint())
-                .putHeader(CONTENT_TYPE_HEADER, MULTIPART_FORM_HEADER)
-                .putHeader(ACCEPT_HEADER, JSON_HEADER)
-                .sendMultipartForm(form);
+        Future<HttpResponse<io.vertx.core.buffer.Buffer>> futureResponse = signRequestContent(content);
 
         futureResponse.onFailure(failure -> {
             log.error("Could not send document do signature server", failure);
@@ -213,15 +209,15 @@ public class GenerateVIHFPolicy {
         });
     }
 
-    @OnResponse
-    public void onResponse(Request request, Response response, PolicyChain policyChain) {
-        if (isASuccessfulResponse(response)) {
-            policyChain.doNext(request, response);
-        } else {
-            policyChain.failWith(
-                    PolicyResult.failure(HttpStatusCode.INTERNAL_SERVER_ERROR_500, "Not a successful response :-("));
-        }
-    }
+//    @OnResponse
+//    public void onResponse(Request request, Response response, PolicyChain policyChain) {
+//        if (isASuccessfulResponse(response)) {
+//            policyChain.doNext(request, response);
+//        } else {
+//            policyChain.failWith(
+//                    PolicyResult.failure(HttpStatusCode.INTERNAL_SERVER_ERROR_500, "Not a successful response :-("));
+//        }
+//    }
 
     private void initRequestResponseProperties(ExecutionContext context, String requestContent) {
         context
@@ -230,35 +226,19 @@ public class GenerateVIHFPolicy {
                 .setVariable(REQUEST_TEMPLATE_VARIABLE, new EvaluableRequest(context.request(), requestContent));
     }
 
-    private String signRequestContent(String requestContent) throws GenericVihfException {
-        try {
-            ApiClient client = new ApiClient();
-            client.setBasePath(configuration.getDigitalSigningEndpoint());
-            SignaturesApiControllerApi api = new SignaturesApiControllerApi(client);
-            File input = null;
-            try {
-                input = File.createTempFile("sign", "tmp");
-                Files.writeString(input.toPath(), requestContent);
-            } catch (IOException e) {
-                log.error("Error when preparing file to sign", e);
-                throw new GenericVihfException("Error when preparing file to sign", e);
-            }
-            ESignSanteSignatureReport report;
-            try {
-                report = api.signatureXMLdsig(configuration.getClientSecret(),
-                        Long.parseLong(configuration.getSigningConfigId()), input);
-            } catch (RestClientException e) {
-                log.error("Could not sign content on Signature server", e);
-                throw new GenericVihfException("Could not sign content on Signature server", e);
-            }
+    private Future<HttpResponse<io.vertx.core.buffer.Buffer>> signRequestContent(String content) {
+        HttpClient httpClient = vertx.createHttpClient(httpClientOptions);
+        WebClient webClient = WebClient.wrap(httpClient);
+        io.vertx.core.buffer.Buffer buffer = io.vertx.core.buffer.Buffer.buffer(content);
+        MultipartForm form = MultipartForm.create().attribute(ID_SIGN_CONF_KEY, configuration.getSigningConfigId())
+                .attribute(SIGN_SECRET_KEY, configuration.getClientSecret())
+                .binaryFileUpload("file", "file", buffer, MediaType.MEDIA_APPLICATION_OCTET_STREAM.toMediaString());
 
-            requestContent = new String(Base64.getDecoder().decode(report.getDocSigne()));
-
-            return requestContent;
-        } catch (Exception e) {
-            log.error("Could not sign VIHF", e);
-            throw new GenericVihfException("Could not sign VIHF", e);
-        }
+        return webClient
+                .post(configuration.getDigitalSigningEndpoint())
+                .putHeader(CONTENT_TYPE_HEADER, MULTIPART_FORM_HEADER)
+                .putHeader(ACCEPT_HEADER, JSON_HEADER)
+                .sendMultipartForm(form);
     }
 
     private String injectVihfToRequestContent(String requestContent, String vihf)
@@ -320,4 +300,8 @@ public class GenerateVIHFPolicy {
         }
     }
 
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 }
