@@ -97,7 +97,8 @@ public class VihfBuilder {
         assertion.setIssueInstant(dateNow);
         assertion.setSubject(fetchSubject());
         assertion.setVersion(ASSERTION_VERSION);
-        assertion.setID(UUID.randomUUID().toString());
+        assertion.setID("test_id");
+//        assertion.setID(UUID.randomUUID().toString());
         assertion.setAuthnStatement(fetchAuthnStatement());
         assertion.setAttributeStatement(fetchAttributeStatement());
 

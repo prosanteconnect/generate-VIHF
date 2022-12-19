@@ -177,6 +177,7 @@ public class GenerateVIHFPolicy{
         String content = request.getContent();
         try {
             content = injectVihfToRequestContent(request.getContent(), vihfToken);
+            log.error(content);
 
         } catch (GenericVihfException e) {
             onError.accept(PolicyResult.failure(GENERATE_VIHF_ERROR));
