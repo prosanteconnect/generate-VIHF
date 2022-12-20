@@ -107,7 +107,7 @@ public class VihfBuilder {
     private Issuer fetchIssuer() {
         Issuer issuer = assertionFactory.createIssuer();
         issuer.setFormat(ISSUER_FORMAT);
-        issuer.setValue(new String(configuration.getCertificateDN().getBytes(), StandardCharsets.UTF_8));
+        issuer.setValue(configuration.getCertificateDN());
 
         return issuer;
     }

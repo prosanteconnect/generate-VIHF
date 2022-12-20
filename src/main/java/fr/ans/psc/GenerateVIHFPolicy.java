@@ -63,7 +63,6 @@ public class GenerateVIHFPolicy{
      * The associated configuration to this GenerateVIHF Policy
      */
     private final GenerateVIHFPolicyConfiguration configuration;
-
     private final ObjectMapper mapper;
     private Vertx vertx;
     private HttpClientOptions httpClientOptions;
@@ -165,7 +164,6 @@ public class GenerateVIHFPolicy{
         String content = request.getContent();
         try {
             content = injectVihfToRequestContent(request.getContent(), vihfToken);
-            log.error(content);
 
         } catch (GenericVihfException e) {
             onError.accept(PolicyResult.failure(GENERATE_VIHF_ERROR));
