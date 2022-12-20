@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -106,7 +107,7 @@ public class VihfBuilder {
     private Issuer fetchIssuer() {
         Issuer issuer = assertionFactory.createIssuer();
         issuer.setFormat(ISSUER_FORMAT);
-        issuer.setValue(configuration.getCertificateDN());
+        issuer.setValue(new String(configuration.getCertificateDN().getBytes(), StandardCharsets.UTF_8));
 
         return issuer;
     }
