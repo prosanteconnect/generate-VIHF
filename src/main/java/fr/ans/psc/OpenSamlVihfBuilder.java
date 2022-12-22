@@ -162,7 +162,7 @@ public class OpenSamlVihfBuilder {
 
         Attribute roleAttribute = attributeBuilder.buildObject();
         roleAttribute.getAttributeValues().add(
-                addCommonCodeAttribute(attributeBuilder, SUBJECT_ROLE, roles));
+                addCommonCodeAttribute(attributeBuilder, SUBJECT_ROLE, roles, "Role"));
 
         return roleAttribute;
     }
@@ -172,7 +172,8 @@ public class OpenSamlVihfBuilder {
                 "mode acces VIHF 2.0", "Accès normal");
 
         Attribute purposeOfUseAttribute = attributeBuilder.buildObject();
-        purposeOfUseAttribute.getAttributeValues().add(addCommonCodeAttribute(attributeBuilder, PURPOSE_OF_USE, Collections.singletonList(purposeOfUse)));
+        purposeOfUseAttribute.getAttributeValues().add(addCommonCodeAttribute(
+                attributeBuilder, PURPOSE_OF_USE, Collections.singletonList(purposeOfUse), "PurposeOfUse"));
 
         return purposeOfUseAttribute;
     }
@@ -192,7 +193,8 @@ public class OpenSamlVihfBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    private Attribute addCommonCodeAttribute(AttributeBuilder attributeBuilder, String attributeName, List<? extends CommonCode> commonCodeList) {
+    private Attribute addCommonCodeAttribute(AttributeBuilder attributeBuilder, String attributeName, List<? extends CommonCode> commonCodeList,
+                                             String name) {
         Attribute attributeGroup = attributeBuilder.buildObject();
         attributeGroup.setName(attributeName);
 
@@ -206,7 +208,7 @@ public class OpenSamlVihfBuilder {
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("codeSystemName"), commonCode.getCodeSystemName());
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("displayName"), commonCode.getDisplayName());
 
-            XSAny xsAnyRole = builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
+            XSAny xsAnyRole = builder.buildObject(QName.valueOf(name));
             xsAnyRole.getUnknownXMLObjects().add(xsAnyRoleAttributeValue);
 
             attributeGroup.getAttributeValues().add(xsAnyRole);
