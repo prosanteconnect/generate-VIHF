@@ -32,6 +32,8 @@ public class GenerateVIHFPolicyConfiguration implements PolicyConfiguration {
 
     private String signingPrivateKey;
 
+    private String acCerts;
+
     public String getDigitalSigningEndpoint() {
         return digitalSigningEndpoint;
     }
@@ -126,5 +128,13 @@ public class GenerateVIHFPolicyConfiguration implements PolicyConfiguration {
 
     public void setSigningPrivateKey(String signingPrivateKey) {
         this.signingPrivateKey = signingPrivateKey;
+    }
+
+    public String getAcCerts() {
+        return acCerts;
+    }
+
+    public void setAcCerts(String acCerts) {
+        this.acCerts = acCerts;
     }
 }

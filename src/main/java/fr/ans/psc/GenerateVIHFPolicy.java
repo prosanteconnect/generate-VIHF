@@ -64,7 +64,9 @@ import java.security.*;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static fr.ans.psc.utils.Constants.*;
@@ -327,6 +329,18 @@ public class GenerateVIHFPolicy {
             X509Certificate signingCertificate = (X509Certificate) certFac.generateCertificate(signingCertIS);
             signingCertIS.close();
 
+            List<X509Certificate> certChain = new ArrayList<>();
+            String acCertsString = configuration.getAcCerts();
+            acCertsString.replaceAll("-----END CERTIFICATE-----", "-----END CERTIFICATE-----;");
+            String[] acCerts =  acCertsString.split(";");
+
+            for (String cert : acCerts) {
+                log.error("AC cert : " + cert);
+                InputStream is = new ByteArrayInputStream(cert.getBytes(StandardCharsets.UTF_8));
+                X509Certificate ac = (X509Certificate) certFac.generateCertificate(is);
+                certChain.add(ac);
+            }
+
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(
                     Base64.getDecoder().decode(configuration.getSigningPrivateKey()));
@@ -334,6 +348,7 @@ public class GenerateVIHFPolicy {
 
             credential.setPrivateKey(privateKey);
             credential.setEntityCertificate(signingCertificate);
+            credential.setEntityCertificateChain(certChain);
             credential.setPublicKey(signingCertificate.getPublicKey());
 
             return credential;
