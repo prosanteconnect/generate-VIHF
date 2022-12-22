@@ -132,6 +132,7 @@ public class OpenSamlVihfBuilder {
         return attributeList;
     }
 
+    @SuppressWarnings("unchecked")
     private Attribute fetchAttribute(AttributeBuilder attributeBuilder, String attributeName, String attributeContent) {
         XMLObjectBuilder<XSAny> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
         XSAny attributeValue = builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
