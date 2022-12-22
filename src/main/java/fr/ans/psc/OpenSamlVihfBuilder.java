@@ -15,9 +15,7 @@ import fr.ans.psc.vihf.PurposeOfUse;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
-import org.opensaml.saml2.core.impl.AssertionBuilder;
-import org.opensaml.saml2.core.impl.AttributeBuilder;
-import org.opensaml.saml2.core.impl.AttributeStatementBuilder;
+import org.opensaml.saml2.core.impl.*;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.Namespace;
 import org.opensaml.xml.XMLObject;
@@ -76,7 +74,7 @@ public class OpenSamlVihfBuilder {
     }
 
     private Issuer fetchIssuer() {
-        Issuer issuer = (Issuer) createSamlObject(Issuer.DEFAULT_ELEMENT_NAME);
+        Issuer issuer = new IssuerBuilder().buildObject();
         issuer.setFormat(ISSUER_FORMAT);
         issuer.setValue(configuration.getCertificateDN());
 
@@ -84,21 +82,21 @@ public class OpenSamlVihfBuilder {
     }
 
     private Subject fetchSubject() {
-        Subject subject = (Subject) createSamlObject(Subject.DEFAULT_ELEMENT_NAME);
-        NameID nameId = (NameID) createSamlObject(NameID.DEFAULT_ELEMENT_NAME);
+        NameID nameId = new NameIDBuilder().buildObject();
         nameId.setValue(userInfos.getSubjectNameID());
+        Subject subject = new SubjectBuilder().buildObject();
         subject.setNameID(nameId);
 
         return subject;
     }
 
     private AuthnStatement fetchAuthnStatement(DateTime dateTime) {
-        AuthnContext authnContext = (AuthnContext) createSamlObject(AuthnContext.DEFAULT_ELEMENT_NAME);
-        AuthnContextClassRef authnContextClassRef = (AuthnContextClassRef) createSamlObject(AuthnContextClassRef.DEFAULT_ELEMENT_NAME);
+        AuthnContext authnContext = new AuthnContextBuilder().buildObject();
+        AuthnContextClassRef authnContextClassRef = new AuthnContextClassRefBuilder().buildObject();
         authnContextClassRef.setAuthnContextClassRef(AUTHN_CONTEXT_CLASS_REF);
         authnContext.setAuthnContextClassRef(authnContextClassRef);
 
-        AuthnStatement authnStatement = (AuthnStatement) createSamlObject(AuthnStatement.DEFAULT_ELEMENT_NAME);
+        AuthnStatement authnStatement = new AuthnStatementBuilder().buildObject();
         authnStatement.setAuthnInstant(dateTime);
         authnStatement.setAuthnContext(authnContext);
 
