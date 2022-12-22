@@ -160,23 +160,15 @@ public class OpenSamlVihfBuilder {
             roles.add(getVihfRole(nosMap, exercicePro.getExpertiseCode(), "specialites RPPS"));
         }
 
-        Attribute roleAttribute = attributeBuilder.buildObject();
-        roleAttribute.setName(SUBJECT_ROLE);
-        roleAttribute.getAttributeValues().add(
-                addCommonCodeAttribute(attributeBuilder, SUBJECT_ROLE, roles, "Role"));
-
-        return roleAttribute;
+        return addCommonCodeAttribute(attributeBuilder, SUBJECT_ROLE, roles, "Role");
     }
 
     private Attribute fetchPurposeOfUse(AttributeBuilder attributeBuilder) {
         VihfPurposeOfUse purposeOfUse = new VihfPurposeOfUse("normal", "1.2.250.1.213.1.1.4.248",
                 "mode acces VIHF 2.0", "Accès normal");
 
-        Attribute purposeOfUseAttribute = attributeBuilder.buildObject();
-        purposeOfUseAttribute.getAttributeValues().add(addCommonCodeAttribute(
-                attributeBuilder, PURPOSE_OF_USE, Collections.singletonList(purposeOfUse), "PurposeOfUse"));
-
-        return purposeOfUseAttribute;
+        return addCommonCodeAttribute(attributeBuilder, PURPOSE_OF_USE,
+                Collections.singletonList(purposeOfUse), "PurposeOfUse");
     }
 
     private VihfRole getVihfRole(Map<String, Concept> nosMap, String code, String codeSystemName) throws NosReferentialRetrievingException {
