@@ -161,6 +161,7 @@ public class OpenSamlVihfBuilder {
         }
 
         Attribute roleAttribute = attributeBuilder.buildObject();
+        roleAttribute.setName(SUBJECT_ROLE);
         roleAttribute.getAttributeValues().add(
                 addCommonCodeAttribute(attributeBuilder, SUBJECT_ROLE, roles, "Role"));
 
@@ -199,19 +200,15 @@ public class OpenSamlVihfBuilder {
         attributeGroup.setName(attributeName);
 
         for (CommonCode commonCode : commonCodeList) {
-//            XSAny xsAnyRoleAttributeValue = (XSAny) createSamlObject(XSAny.TYPE_NAME);
             XMLObjectBuilder<XSAny> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
-            XSAny xsAnyRoleAttributeValue = builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
+            XSAny xsAnyRoleAttributeValue = builder.buildObject("urn:hl7-org:v3", name, null);
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi"), CE_TYPE);
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("code"), commonCode.getCode());
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("codeSystem"), commonCode.getCodeSystem());
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("codeSystemName"), commonCode.getCodeSystemName());
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("displayName"), commonCode.getDisplayName());
 
-            XSAny xsAnyRole = builder.buildObject("urn:hl7-org:v3", name, null);
-            xsAnyRole.getUnknownXMLObjects().add(xsAnyRoleAttributeValue);
-
-            attributeGroup.getAttributeValues().add(xsAnyRole);
+            attributeGroup.getAttributeValues().add(xsAnyRoleAttributeValue);
         }
         return attributeGroup;
     }
