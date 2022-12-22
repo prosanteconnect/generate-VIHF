@@ -29,8 +29,10 @@ import io.vertx.core.http.*;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.multipart.MultipartForm;
+import org.opensaml.DefaultBootstrap;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.ws.wssecurity.WSSecurityConstants;
+import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.io.MarshallerFactory;
 import org.opensaml.xml.io.MarshallingException;
@@ -92,10 +94,17 @@ public class GenerateVIHFPolicy {
      *
      * @param configuration the associated configuration to the new GenerateVIHF Policy instance
      */
-    public GenerateVIHFPolicy(GenerateVIHFPolicyConfiguration configuration) {
+    public GenerateVIHFPolicy(GenerateVIHFPolicyConfiguration configuration){
         this.configuration = configuration;
         this.mapper = new ObjectMapper();
         this.signingCredential = initSigningCredential(configuration);
+        try {
+            DefaultBootstrap.bootstrap();
+        } catch (ConfigurationException e) {
+            log.error("Unable to bootstrap opensaml", e);
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void initVertxClient(ExecutionContext executionContext) {

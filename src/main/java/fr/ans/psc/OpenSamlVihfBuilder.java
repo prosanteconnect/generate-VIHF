@@ -133,12 +133,6 @@ public class OpenSamlVihfBuilder {
 
     @SuppressWarnings("unchecked")
     private Attribute fetchAttribute(AttributeBuilder attributeBuilder, String attributeName, String attributeContent) {
-        Map<QName, XMLObjectBuilder> map = Configuration.getBuilderFactory().getBuilders();
-        map.entrySet().stream().map(entry -> {
-            log.error(entry.getKey().toString());
-            log.error(entry.getValue().toString());
-            return null;
-        });
         XMLObjectBuilder<XSAny> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
         XSAny attributeValue = builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
         attributeValue.setTextContent(attributeContent);
