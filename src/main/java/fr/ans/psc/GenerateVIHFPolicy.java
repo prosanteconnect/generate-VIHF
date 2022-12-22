@@ -30,6 +30,7 @@ import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.multipart.MultipartForm;
 import org.opensaml.saml2.core.Assertion;
+import org.opensaml.ws.wssecurity.WSSecurityConstants;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.io.MarshallerFactory;
 import org.opensaml.xml.io.MarshallingException;
@@ -375,19 +376,22 @@ public class GenerateVIHFPolicy {
         Marshaller marshaller = marshallerFactory.getMarshaller(vihfToken);
 
         try {
-            Element vihfFragment = marshaller.marshall(vihfToken);
-            Signer.signObject(vihfToken.getSignature());
-
             // import body
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             dbFactory.setNamespaceAware(true);
             DocumentBuilder builder = null;
             builder = dbFactory.newDocumentBuilder();
             Document body = builder.parse(new InputSource(new StringReader(requestContent)));
+            Node wsseSec = body.createElementNS(WSSecurityConstants.WSSE_NS, "wsse:Security");
+
+            Element vihfFragment = marshaller.marshall(vihfToken);
+            Signer.signObject(vihfToken.getSignature());
+
+            Node vihfNode = body.importNode(vihfFragment, true);
+            wsseSec.appendChild(vihfNode);
 
             Node soapHeader = body.getElementsByTagNameNS("*", "Header").item(0);
-            Node vihfNode = body.importNode(vihfFragment, true);
-            soapHeader.appendChild(vihfNode);
+            soapHeader.appendChild(wsseSec);
 
             return getXMLStringFromDocument(body);
         } catch (SignatureException | ParserConfigurationException | IOException | SAXException | MarshallingException e) {

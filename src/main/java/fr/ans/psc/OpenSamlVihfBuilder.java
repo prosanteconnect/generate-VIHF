@@ -133,7 +133,8 @@ public class OpenSamlVihfBuilder {
     }
 
     private Attribute fetchAttribute(AttributeBuilder attributeBuilder, String attributeName, String attributeContent) {
-        XSAny attributeValue = (XSAny) createSamlObject(XSAny.TYPE_NAME);
+        XMLObjectBuilder<XSAny> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+        XSAny attributeValue = builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
         attributeValue.setTextContent(attributeContent);
 
         Attribute attribute = attributeBuilder.buildObject();
@@ -190,19 +191,22 @@ public class OpenSamlVihfBuilder {
                 nosMap.get(code).getDisplayName());
     }
 
+    @SuppressWarnings("unchecked")
     private Attribute addCommonCodeAttribute(AttributeBuilder attributeBuilder, String attributeName, List<? extends CommonCode> commonCodeList) {
         Attribute attributeGroup = attributeBuilder.buildObject();
         attributeGroup.setName(attributeName);
 
         for (CommonCode commonCode : commonCodeList) {
-            XSAny xsAnyRoleAttributeValue = (XSAny) createSamlObject(XSAny.TYPE_NAME);
+//            XSAny xsAnyRoleAttributeValue = (XSAny) createSamlObject(XSAny.TYPE_NAME);
+            XMLObjectBuilder<XSAny> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+            XSAny xsAnyRoleAttributeValue = builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi"), CE_TYPE);
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("code"), commonCode.getCode());
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("codeSystem"), commonCode.getCodeSystem());
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("codeSystemName"), commonCode.getCodeSystemName());
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("displayName"), commonCode.getDisplayName());
 
-            XSAny xsAnyRole = (XSAny) createSamlObject(XSAny.TYPE_NAME);
+            XSAny xsAnyRole = builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             xsAnyRole.getUnknownXMLObjects().add(xsAnyRoleAttributeValue);
 
             attributeGroup.getAttributeValues().add(xsAnyRole);
