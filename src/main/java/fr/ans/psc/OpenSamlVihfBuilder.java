@@ -208,7 +208,7 @@ public class OpenSamlVihfBuilder {
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("codeSystemName"), commonCode.getCodeSystemName());
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("displayName"), commonCode.getDisplayName());
 
-            XSAny xsAnyRole = builder.buildObject(QName.valueOf(name));
+            XSAny xsAnyRole = builder.buildObject("urn:hl7-org:v3", name, null);
             xsAnyRole.getUnknownXMLObjects().add(xsAnyRoleAttributeValue);
 
             attributeGroup.getAttributeValues().add(xsAnyRole);
