@@ -5,8 +5,6 @@ package fr.ans.psc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import fr.ans.esignsante.ApiClient;
-import fr.ans.esignsante.api.SignaturesApiControllerApi;
 import fr.ans.esignsante.model.ESignSanteSignatureReport;
 import fr.ans.psc.exception.GenericVihfException;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
@@ -63,11 +61,8 @@ import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.function.Consumer;
@@ -328,13 +323,13 @@ public class GenerateVIHFPolicy {
             BasicX509Credential credential = new BasicX509Credential();
 
             CertificateFactory certFac = CertificateFactory.getInstance("x509");
-            InputStream signingCertIS = new ByteArrayInputStream(configuration.getSigningCertificatePublicKey().getBytes(StandardCharsets.UTF_8));
+            InputStream signingCertIS = new ByteArrayInputStream(configuration.getSigningCertificate().getBytes(StandardCharsets.UTF_8));
             X509Certificate signingCertificate = (X509Certificate) certFac.generateCertificate(signingCertIS);
             signingCertIS.close();
 
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(
-                    Base64.getDecoder().decode(configuration.getSigningCertificatePrivateKey()));
+                    Base64.getDecoder().decode(configuration.getSigningPrivateKey()));
             PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
 
             credential.setPrivateKey(privateKey);

@@ -58,6 +58,18 @@
       "x-schema-form": {
         "type": "password"
       }
+    },
+    "signingCertificate" : {
+      "title" : "certificat de signature",
+      "description": "Clé publique du certificat de signature, au format PEM",
+      "type": "string",
+      "default": ""
+    },
+    "signingPrivateKey" : {
+      "title" : "Clé privée",
+      "description": "Clé privée du certificat de signature, au format PEM / PKCS8",
+      "type": "string",
+      "default": ""
     }
   }
 }
