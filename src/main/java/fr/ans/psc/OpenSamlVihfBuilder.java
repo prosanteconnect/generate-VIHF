@@ -122,6 +122,7 @@ public class OpenSamlVihfBuilder {
         attributeList.add(fetchAttribute(attributeBuilder, AUTHENTIFICATION_MODE, AUTH_MODE_VALUE));
 
         attributeList.add(fetchAttribute(attributeBuilder, RESOURCE_ID, patientINS + "^^^&1.2.250.1.213.1.4.10&ISO^NH"));
+        attributeList.add(fetchAttribute(attributeBuilder, RESOURCE_URN, URN_DMP));
         attributeList.add(fetchPurposeOfUse(attributeBuilder));
 
         attributeList.add(fetchAttribute(attributeBuilder, LPS_NOM, configuration.getLpsName()));
