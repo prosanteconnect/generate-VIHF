@@ -70,6 +70,12 @@
       "description": "Clé privée du certificat de signature, au format PEM / PKCS8",
       "type": "string",
       "default": ""
+    },
+    "acCerts" : {
+      "title" : "Autorités de confiance",
+      "description": "Autorités de confiance, au format PEM",
+      "type": "string",
+      "default": ""
     }
   }
 }
