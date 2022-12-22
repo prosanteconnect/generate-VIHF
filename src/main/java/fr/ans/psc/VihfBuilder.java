@@ -77,14 +77,6 @@ public class VihfBuilder {
         return tokenVIHF;
     }
 
-//    private Envelope fetchSoapEnvelope() throws GenericVihfException {
-//    	Envelope envelope = assertionFactory.createEnvelope();
-//    	Header header = assertionFactory.createHeader();
-//    	envelope.setHeader(header);
-//    	header.setSecurity(fetchSamlSecurity());
-//    	return envelope;
-//    }
-
     private Security fetchSamlSecurity() throws GenericVihfException {
         Security security = assertionFactory.createSecurity();
         security.setAssertion(fetchAssertion());

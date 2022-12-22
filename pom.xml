@@ -22,7 +22,7 @@
 
     <groupId>fr.ans.psc</groupId>
     <artifactId>generateVIHF</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
 
     <name>Gravitee.io APIM - Policy - GenerateVIHF</name>
     <description>Gravitee Policy for VIHF token generation</description>
@@ -49,6 +49,7 @@
 
         <jackson-version>2.8.9</jackson-version>
         <logback.version>1.2.11</logback.version>
+        <opensaml.version>2.6.4</opensaml.version>
     </properties>
 
     <dependencies>
@@ -105,6 +106,12 @@
             <groupId>fr.ans.esignsante</groupId>
             <artifactId>esignsante-java-client</artifactId>
             <version>2.5.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>${opensaml.version}</version>
         </dependency>
 
         <!-- logging -->

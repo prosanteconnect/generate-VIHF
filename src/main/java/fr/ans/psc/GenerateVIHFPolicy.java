@@ -31,9 +31,22 @@ import io.vertx.core.http.*;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.multipart.MultipartForm;
+import org.opensaml.saml2.core.Assertion;
+import org.opensaml.xml.io.Marshaller;
+import org.opensaml.xml.io.MarshallerFactory;
+import org.opensaml.xml.io.MarshallingException;
+import org.opensaml.xml.security.SecurityException;
+import org.opensaml.xml.security.credential.Credential;
+import org.opensaml.xml.security.x509.BasicX509Credential;
+import org.opensaml.xml.security.x509.X509KeyInfoGeneratorFactory;
+import org.opensaml.xml.signature.*;
+import org.opensaml.xml.signature.Signature;
+import org.opensaml.xml.signature.SignatureException;
+import org.opensaml.xml.signature.Signer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -46,10 +59,16 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.function.Consumer;
 
@@ -57,7 +76,7 @@ import static fr.ans.psc.utils.Constants.*;
 import static io.gravitee.common.util.VertxProxyOptionsUtils.setSystemProxy;
 
 @SuppressWarnings("unused")
-public class GenerateVIHFPolicy{
+public class GenerateVIHFPolicy {
     private final Logger log = LoggerFactory.getLogger(GenerateVIHFPolicy.class);
     /**
      * The associated configuration to this GenerateVIHF Policy
@@ -66,6 +85,7 @@ public class GenerateVIHFPolicy{
     private final ObjectMapper mapper;
     private Vertx vertx;
     private HttpClientOptions httpClientOptions;
+    private Credential signingCredential;
 
     /**
      * Create a new GenerateVIHF Policy instance based on its associated configuration
@@ -75,6 +95,7 @@ public class GenerateVIHFPolicy{
     public GenerateVIHFPolicy(GenerateVIHFPolicyConfiguration configuration) {
         this.configuration = configuration;
         this.mapper = new ObjectMapper();
+        this.signingCredential = initSigningCredential(configuration);
     }
 
     private void initVertxClient(ExecutionContext executionContext) {
@@ -119,23 +140,38 @@ public class GenerateVIHFPolicy{
             @Override
             public void end() {
                 initRequestResponseProperties(executionContext, buffer.toString());
-                initVertxClient(executionContext);
-                generateVihfAndSign(
-                        executionContext,
-                        result -> {
-                            if (result.length() > 0) {
-                                // REWRITE BUFFER WITH TRANSFORMED RESULT
-                                HttpHeaders headers = executionContext.request().headers();
-                                headers.remove(CONTENT_LENGTH_HEADER);
-                                headers.set(TRANSFER_ENCODING_HEADER, CHUNKED);
-                                log.error(result);
-                                Buffer buf = Buffer.buffer();
-                                buf.appendString(result);
-                                super.write(buf);
-                            }
-                            super.end();
-                        },
-                        policyChain::streamFailWith);
+//                initVertxClient(executionContext);
+//                generateVihfAndSign(
+//                        executionContext,
+//                        result -> {
+//                            if (result.length() > 0) {
+//                                // REWRITE BUFFER WITH TRANSFORMED RESULT
+//                                HttpHeaders headers = executionContext.request().headers();
+//                                headers.remove(CONTENT_LENGTH_HEADER);
+//                                headers.set(TRANSFER_ENCODING_HEADER, CHUNKED);
+//                                log.error(result);
+//                                Buffer buf = Buffer.buffer();
+//                                buf.appendString(result);
+//                                super.write(buf);
+//                            }
+//                            super.end();
+//                        },
+//                        policyChain::streamFailWith);
+                try {
+                    String body = generateOpenSamlVihfAndSign(executionContext);
+                    if (body.length() > 0) {
+                        HttpHeaders headers = executionContext.request().headers();
+                        headers.remove(CONTENT_LENGTH_HEADER);
+                        headers.set(TRANSFER_ENCODING_HEADER, CHUNKED);
+                        log.error(body);
+                        Buffer buf = Buffer.buffer();
+                        buf.appendString(body);
+                        super.write(buf);
+                    }
+                    super.end();
+                } catch (GenericVihfException e) {
+                    policyChain.streamFailWith(PolicyResult.failure(GENERATE_VIHF_ERROR));
+                }
             }
         };
     }
@@ -190,15 +226,21 @@ public class GenerateVIHFPolicy{
         });
     }
 
-//    @OnResponse
-//    public void onResponse(Request request, Response response, PolicyChain policyChain) {
-//        if (isASuccessfulResponse(response)) {
-//            policyChain.doNext(request, response);
-//        } else {
-//            policyChain.failWith(
-//                    PolicyResult.failure(HttpStatusCode.INTERNAL_SERVER_ERROR_500, "Not a successful response :-("));
-//        }
-//    }
+    private String generateOpenSamlVihfAndSign(ExecutionContext context) throws GenericVihfException {
+
+        EvaluableRequest request = (EvaluableRequest) context.getTemplateEngine().getTemplateContext()
+                .lookupVariable(REQUEST_TEMPLATE_VARIABLE);
+
+        UserInfos userInfos = getUserInfos(context);
+        String workSituationId = request.getHeaders().get(WORK_SITUATION_HEADER);
+        String insHeader = request.getHeaders().get(PATIENT_INS_HEADER);
+        OpenSamlVihfBuilder vihfBuilder = new OpenSamlVihfBuilder(userInfos, workSituationId, insHeader, configuration);
+
+        Assertion vihfToken = vihfBuilder.fetchAssertion();
+        vihfToken.setSignature(prepareSignature());
+
+        return insertVIHFinMessageAndSignIt(vihfToken, request.getContent());
+    }
 
     private void initRequestResponseProperties(ExecutionContext context, String requestContent) {
         context
@@ -278,6 +320,90 @@ public class GenerateVIHFPolicy{
                 return true;
             default:
                 return false;
+        }
+    }
+
+    private Credential initSigningCredential(GenerateVIHFPolicyConfiguration configuration) {
+        try {
+            BasicX509Credential credential = new BasicX509Credential();
+
+            CertificateFactory certFac = CertificateFactory.getInstance("x509");
+            InputStream signingCertIS = new ByteArrayInputStream(configuration.getSigningCertificatePublicKey().getBytes(StandardCharsets.UTF_8));
+            X509Certificate signingCertificate = (X509Certificate) certFac.generateCertificate(signingCertIS);
+            signingCertIS.close();
+
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(
+                    Base64.getDecoder().decode(configuration.getSigningCertificatePrivateKey()));
+            PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
+
+            credential.setPrivateKey(privateKey);
+            credential.setEntityCertificate(signingCertificate);
+            credential.setPublicKey(signingCertificate.getPublicKey());
+
+            return credential;
+        } catch (Exception e) {
+            log.error("Could not generate credential from certificate", e);
+            throw new RuntimeException("Could not generate credential from certificate", e);
+        }
+
+    }
+
+    private KeyInfo getKeyInfo(Credential credential) throws SecurityException {
+        KeyInfo keyinfo = null;
+        X509KeyInfoGeneratorFactory factory;
+        factory = new X509KeyInfoGeneratorFactory();
+        factory.setEmitEntityCertificate(true);
+        // Creating a KeyInfo object and attaching to the Signature object is
+        // mandatory for the user certificate to appear at the signature.
+        keyinfo = factory.newInstance().generate(credential);
+        return keyinfo;
+    }
+
+    private Signature prepareSignature() throws GenericVihfException {
+        try {
+            Signature signature = (Signature) org.opensaml.Configuration
+                    .getBuilderFactory().getBuilder(
+                            Signature.DEFAULT_ELEMENT_NAME).buildObject(
+                            Signature.DEFAULT_ELEMENT_NAME);
+
+            log.info("Set signingCredential to : " + signingCredential);
+            signature.setSigningCredential(signingCredential);
+            signature.setSignatureAlgorithm(SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1);
+            signature.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
+            signature.setKeyInfo(getKeyInfo(signingCredential));
+
+            return signature;
+        } catch (SecurityException e) {
+            log.error("Could not generate saml signatrure element", e);
+            throw new GenericVihfException(VIHF_SIGNING_ERROR, e);
+        }
+    }
+
+    private String insertVIHFinMessageAndSignIt(Assertion vihfToken, String requestContent) throws GenericVihfException {
+        MarshallerFactory marshallerFactory = org.opensaml.Configuration
+                .getMarshallerFactory();
+        Marshaller marshaller = marshallerFactory.getMarshaller(vihfToken);
+
+        try {
+            Element vihfFragment = marshaller.marshall(vihfToken);
+            Signer.signObject(vihfToken.getSignature());
+
+            // import body
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            dbFactory.setNamespaceAware(true);
+            DocumentBuilder builder = null;
+            builder = dbFactory.newDocumentBuilder();
+            Document body = builder.parse(new InputSource(new StringReader(requestContent)));
+
+            Node soapHeader = body.getElementsByTagNameNS("*", "Header").item(0);
+            Node vihfNode = body.importNode(vihfFragment, true);
+            soapHeader.appendChild(vihfNode);
+
+            return getXMLStringFromDocument(body);
+        } catch (SignatureException | ParserConfigurationException | IOException | SAXException | MarshallingException e) {
+            log.error("error", e);
+            throw new GenericVihfException(VIHF_SIGNING_ERROR, e);
         }
     }
 }
