@@ -325,6 +325,7 @@ public class GenerateVIHFPolicy {
             BasicX509Credential credential = new BasicX509Credential();
 
             CertificateFactory certFac = CertificateFactory.getInstance("x509");
+            log.error(configuration.getSigningCertificate());
             InputStream signingCertIS = new ByteArrayInputStream(configuration.getSigningCertificate().getBytes(StandardCharsets.UTF_8));
             X509Certificate signingCertificate = (X509Certificate) certFac.generateCertificate(signingCertIS);
             signingCertIS.close();
