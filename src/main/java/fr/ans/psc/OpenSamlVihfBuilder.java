@@ -193,6 +193,7 @@ public class OpenSamlVihfBuilder {
 
         for (CommonCode commonCode : commonCodeList) {
             XMLObjectBuilder<XSAny> builder = Configuration.getBuilderFactory().getBuilder(XSAny.TYPE_NAME);
+            XSAny attrValue = builder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME);
             XSAny xsAnyRoleAttributeValue = builder.buildObject("urn:hl7-org:v3", name, null);
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type", "xsi"), CE_TYPE);
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("code"), commonCode.getCode());
@@ -200,7 +201,8 @@ public class OpenSamlVihfBuilder {
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("codeSystemName"), commonCode.getCodeSystemName());
             xsAnyRoleAttributeValue.getUnknownAttributes().put(new QName("displayName"), commonCode.getDisplayName());
 
-            attributeGroup.getAttributeValues().add(xsAnyRoleAttributeValue);
+            attrValue.getUnknownXMLObjects().add(xsAnyRoleAttributeValue);
+            attributeGroup.getAttributeValues().add(attrValue);
         }
         return attributeGroup;
     }
