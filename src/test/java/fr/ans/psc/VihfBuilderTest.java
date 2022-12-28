@@ -2,17 +2,23 @@ package fr.ans.psc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ans.psc.exception.GenericVihfException;
-import fr.ans.psc.exception.NosReferentialRetrievingException;
-import fr.ans.psc.exception.WrongWorkSituationKeyException;
 import fr.ans.psc.model.prosanteconnect.UserInfos;
+import org.junit.Before;
 import org.junit.Test;
+import org.opensaml.DefaultBootstrap;
+import org.opensaml.saml2.core.Assertion;
+import org.opensaml.xml.ConfigurationException;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class VihfBuilderTest {
+
+    @Before
+    public void init() throws ConfigurationException {
+        DefaultBootstrap.bootstrap();
+    }
 
     @Test
     public void generateVIHFTest() throws IOException, GenericVihfException {
@@ -25,12 +31,12 @@ public class VihfBuilderTest {
         configuration.setLpsVersion("1.0");
         configuration.setLpsHomologationNumber("123");
 
-        VihfBuilder vihfBuilder = new VihfBuilder(userInfos, "10C", "2 88 09 17 202 203 71", configuration);
+        OpenSamlVihfBuilder builder = new OpenSamlVihfBuilder(userInfos, "10C", "2 88 09 17 202 203 71", configuration);
+        Assertion genVIHF = builder.fetchAssertion();
         assertNotNull(configuration);
-        String generatedVihf = vihfBuilder.generateVIHF();
-        assertNotEquals(null, generatedVihf);
-        System.out.println(generatedVihf);
-
+        assertNotEquals(null, genVIHF);
+        assertEquals("CN=serviceps.sesam-vitale.fr,OU=339172288100052,O=GIE SESAM VITALE,ST=Sarthe (72),C=FR", genVIHF.getIssuer().getValue());
+        assertEquals("899700366240", genVIHF.getSubject().getNameID().getValue());
     }
 
     @Test(expected = GenericVihfException.class)
@@ -44,10 +50,9 @@ public class VihfBuilderTest {
         configuration.setLpsVersion("1.0");
         configuration.setLpsHomologationNumber("123");
 
-        VihfBuilder vihfBuilder = new VihfBuilder(userInfos, "60C", "2 88 09 17 202 203 71", configuration);
         assertNotNull(configuration);
-        vihfBuilder.generateVIHF();
-
+        OpenSamlVihfBuilder builder = new OpenSamlVihfBuilder(userInfos, "60C", "2 88 09 17 202 203 71", configuration);
+        builder.fetchAssertion();
     }
 
 

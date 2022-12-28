@@ -28,12 +28,6 @@ public class GenerateVIHFPolicyConfiguration implements PolicyConfiguration {
 
     private boolean useSSL;
 
-    private String signingCertificate;
-
-    private String signingPrivateKey;
-
-    private String acCerts;
-
     public String getDigitalSigningEndpoint() {
         return digitalSigningEndpoint;
     }
@@ -112,29 +106,5 @@ public class GenerateVIHFPolicyConfiguration implements PolicyConfiguration {
 
     public void setLpsHomologationNumber(String lpsHomologationNumber) {
         this.lpsHomologationNumber = lpsHomologationNumber;
-    }
-
-    public String getSigningCertificate() {
-        return signingCertificate;
-    }
-
-    public void setSigningCertificate(String signingCertificate) {
-        this.signingCertificate = signingCertificate;
-    }
-
-    public String getSigningPrivateKey() {
-        return signingPrivateKey;
-    }
-
-    public void setSigningPrivateKey(String signingPrivateKey) {
-        this.signingPrivateKey = signingPrivateKey;
-    }
-
-    public String getAcCerts() {
-        return acCerts;
-    }
-
-    public void setAcCerts(String acCerts) {
-        this.acCerts = acCerts;
     }
 }
