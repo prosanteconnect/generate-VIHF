@@ -1,7 +1,5 @@
 package fr.ans.psc.model.vihf;
 
-import fr.ans.psc.vihf.PurposeOfUse;
-
 public class VihfPurposeOfUse extends CommonCode {
 
     public VihfPurposeOfUse() {
