@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015 The Gravitee team (http://gravitee.io)
+ * Copyright (C) 2022 ANS (https://esante.gouv.fr)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 @javax.xml.bind.annotation.XmlSchema(namespace = "urn:ihe:iti:svs:2008", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package fr.ans.psc.model.nos;

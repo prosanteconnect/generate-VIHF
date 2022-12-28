@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2015 The Gravitee team (http://gravitee.io)
+    Copyright (C) 2022 ANS (https://esante.gouv.fr)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -26,12 +26,22 @@
 
     <name>Gravitee.io APIM - Policy - GenerateVIHF</name>
     <description>Gravitee Policy for VIHF token generation</description>
+    <url>https://github.com/prosanteconnect/api-proxy</url>
+    <inceptionYear>2022</inceptionYear>
 
     <parent>
-        <groupId>io.gravitee</groupId>
-        <artifactId>gravitee-parent</artifactId>
-        <version>20.0</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.4</version>
     </parent>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.paache.org/licenses/LICENSE-2.0</url>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
 
     <properties>
         <java.version>11</java.version>
@@ -233,6 +243,35 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.11</version>
+                <configuration>
+                    <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+                    <properties>
+                        <owner>ANS</owner>
+                        <email>https://esante.gouv.fr</email>
+                    </properties>
+                    <excludes>
+                        <exclude>LICENSE.txt</exclude>
+                        <exclude>Jenkinsfile</exclude>
+                        <exclude>**/README</exclude>
+                        <exclude>src/main/packaging/**</exclude>
+                        <exclude>src/test/resources/**</exclude>
+                        <exclude>src/main/resources/**</exclude>
+                        <exclude>src/main/webapp/**</exclude>
+                        <exclude>node_modules/**</exclude>
+                        <exclude>dist/**</exclude>
+                        <exclude>.tmp/**</exclude>
+                        <exclude>bower_components/**</exclude>
+                        <exclude>.*</exclude>
+                        <exclude>.*/**</exclude>
+                        <exclude>**/*.adoc</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.1.2</version>
             </plugin>
