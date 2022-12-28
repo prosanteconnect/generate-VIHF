@@ -31,7 +31,7 @@ public class VihfBuilderTest {
         configuration.setLpsVersion("1.0");
         configuration.setLpsHomologationNumber("123");
 
-        OpenSamlVihfBuilder builder = new OpenSamlVihfBuilder(userInfos, "10C", "2 88 09 17 202 203 71", configuration);
+        VihfBuilder builder = new VihfBuilder(userInfos, "10C", "2 88 09 17 202 203 71", configuration);
         Assertion genVIHF = builder.fetchAssertion();
         assertNotNull(configuration);
         assertNotEquals(null, genVIHF);
@@ -51,7 +51,7 @@ public class VihfBuilderTest {
         configuration.setLpsHomologationNumber("123");
 
         assertNotNull(configuration);
-        OpenSamlVihfBuilder builder = new OpenSamlVihfBuilder(userInfos, "60C", "2 88 09 17 202 203 71", configuration);
+        VihfBuilder builder = new VihfBuilder(userInfos, "60C", "2 88 09 17 202 203 71", configuration);
         builder.fetchAssertion();
     }
 

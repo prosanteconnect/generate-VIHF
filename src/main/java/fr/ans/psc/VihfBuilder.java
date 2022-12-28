@@ -1,6 +1,5 @@
 package fr.ans.psc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ans.psc.exception.GenericVihfException;
 import fr.ans.psc.exception.NosReferentialRetrievingException;
 import fr.ans.psc.exception.WrongWorkSituationKeyException;
@@ -17,7 +16,6 @@ import org.opensaml.saml2.core.*;
 import org.opensaml.saml2.core.impl.*;
 import org.opensaml.Configuration;
 import org.opensaml.xml.Namespace;
-import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.XMLObjectBuilder;
 import org.opensaml.xml.schema.XSAny;
 import org.slf4j.LoggerFactory;
@@ -35,23 +33,20 @@ import java.util.*;
 
 import static fr.ans.psc.utils.Constants.*;
 
-public class OpenSamlVihfBuilder {
+public class VihfBuilder {
 
-    private final org.slf4j.Logger log = LoggerFactory.getLogger(OpenSamlVihfBuilder.class);
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(VihfBuilder.class);
     private UserInfos userInfos;
     private String workSituationId;
     private String patientINS;
     private GenerateVIHFPolicyConfiguration configuration;
-    private static final String USER_INFOS_PAYLOAD_KEY = "openid.userinfo.payload";
-    private final ObjectMapper objectMapper;
 
-    public OpenSamlVihfBuilder(UserInfos userInfos, String workSituationId, String patientINS,
-                               GenerateVIHFPolicyConfiguration configuration) {
+    public VihfBuilder(UserInfos userInfos, String workSituationId, String patientINS,
+                       GenerateVIHFPolicyConfiguration configuration) {
         this.userInfos = userInfos;
         this.workSituationId = workSituationId;
         this.patientINS = patientINS;
         this.configuration = configuration;
-        this.objectMapper = new ObjectMapper();
     }
 
 
@@ -206,10 +201,6 @@ public class OpenSamlVihfBuilder {
             attributeGroup.getAttributeValues().add(attrValue);
         }
         return attributeGroup;
-    }
-
-    private XMLObject createSamlObject(QName qname) {
-        return Configuration.getBuilderFactory().getBuilder(qname).buildObject(qname);
     }
 
     private Map<String, Concept> retrieveNosDMPSubjectRoleMap() throws NosReferentialRetrievingException {
