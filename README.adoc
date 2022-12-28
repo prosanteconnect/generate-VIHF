@@ -1,4 +1,4 @@
-= GenerateVIHF Gravitee Policy
+= API-Proxy Gravitee Policy
 
 ifdef::env-github[]
 image:https://ci.gravitee.io/buildStatus/icon?job=gravitee-io/generateVIHF/master["Build status", link="https://ci.gravitee.io/job/gravitee-io/job/generateVIHF/"]
@@ -7,11 +7,11 @@ endif::[]
 
 == Description
 
-La policy GenerateVIHF est conçue pour générer un jeton VIHF non signé, conforme à la spécification du CI-SIS pour une authentification indirecte.
+La policy API-Proxy est conçue pour générer un jeton VIHF signé, conforme à la spécification du CI-SIS pour une authentification indirecte.
 
 Cette policy requête les UserInfos ProSanteConnect dans le contexte Gravitee. Elle s'articule donc particulièrement avec la policy OpenID Connect - UserInfo.
 
-En sortie, un jeton VIHF est mis à disposition dans le contexte Gravitee, sous forme de chaîne de caractères à l'attribut `vihf.token.payload`.
+En sortie, un jeton VIHF est signé par un serveur de signature externe, puis inséré comme header SOAP dans le corps de la requête.
 
 == Compatibilité avec Gravitee API Management
 
@@ -57,6 +57,36 @@ La policy nécessite de configurer les paramètres suivants :
 |Numéro d'homologation de l'API Proxy auprès du DMP
 ^.^|chaîne de caractères
 ^.^|-
+
+.^|Endpoint de signature
+^.^|Oui
+|Endpoint du serveur de signature en XMLdsig
+^.^|chaîne de caractères
+^.^|http://localhost/signatures/xmldsig
+
+.^|Signing Config Id
+^.^|Oui
+|Id de la configuration du serveur de signature utilisée
+^.^|chaîne de caractères
+^.^|-
+
+.^|client Secret
+^.^|Oui
+|Secret requis pour l'accès au serveur de signature
+^.^|chaîne de caractères
+^.^|-
+
+.^|System proxy
+^.^|Oui
+|Utiliser le system proxy
+^.^|booléen
+^.^|faux
+
+.^|Use SSL
+^.^|Oui
+|Utiliser TLS
+^.^|booléen
+^.^|faux
 
 |===
 
